@@ -12,16 +12,24 @@ class NetteExtension extends \Nette\Config\CompilerExtension
 {
 
     /** @var array $defaults Default configuration */
-    public $defaults = array();
+    public $defaults = array(
+        "cache" => true
+    );
 
     /**
      * Processes configuration data
-     *
-     * @return void
      */
     public function loadConfiguration()
     {
         $builder = $this->getContainerBuilder();
+        $config = $this->getConfig($this->defaults);
+
+        // Cache service
+        if ($config["cache"]) {
+            $builder->addDefinition($this->prefix("cache"))->setClass("UniMapper\Extension\NetteCache");
+        }
+
+        // Debug mode only
         if ($builder->parameters["debugMode"]) {
 
             // Create panel service
@@ -41,6 +49,9 @@ class NetteExtension extends \Nette\Config\CompilerExtension
     public function beforeCompile()
     {
         $builder = $this->getContainerBuilder();
+        $config = $this->getConfig($this->defaults);
+
+        // Debug mode only
         if ($builder->parameters["debugMode"]) {
 
             // Register panel
@@ -49,19 +60,24 @@ class NetteExtension extends \Nette\Config\CompilerExtension
                     '$service->onStartup[] = ?',
                     array(array($this->prefix("@panel"), "getTab"))
                 );
+        }
 
-            // Find registered repository services
-            $panel = $builder->getDefinition($this->prefix("panel"));
-            foreach ($builder->getDefinitions() as $serviceName => $serviceDefinition) {
+        // Find registered repositories
+        foreach ($builder->getDefinitions() as $serviceName => $serviceDefinition) {
 
-                $class = $serviceDefinition->class !== NULL ? $serviceDefinition->class : $serviceDefinition->factory->entity;
-                if (class_exists($class) && is_subclass_of($class, "UniMapper\Repository")) {
+            $class = $serviceDefinition->class !== NULL ? $serviceDefinition->class : $serviceDefinition->factory->entity;
+            if (class_exists($class) && is_subclass_of($class, "UniMapper\Repository")) {
 
+                $builder->getDefinition($serviceName)->addSetup("setLogger", new \UniMapper\Logger);
 
-                    $builder->getDefinition($serviceName)->addSetup("setLogger", new \UniMapper\Logger);
+                // Set repository cache
+                if ($config["cache"]) {
+                    $builder->getDefinition($serviceName)->addSetup("setCache", $builder->getDefinition($this->prefix("cache")));
+                }
 
-                    // Register repository into the panel
-                    $panel->addSetup('registerRepository', "@" . $serviceName);
+                // Register repository into the panel
+                if ($builder->parameters["debugMode"]) {
+                    $builder->getDefinition($this->prefix("panel"))->addSetup('registerRepository', "@" . $serviceName);
                 }
             }
         }
