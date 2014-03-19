@@ -1,8 +1,8 @@
 <?php
 
-namespace UniMapper\Extension;
+namespace UniMapper\Nette;
 
-class NetteCache implements \UniMapper\Cache\ICache
+class Cache implements \UniMapper\Cache\ICache
 {
 
     /** @var \Nette\Caching\Cache */

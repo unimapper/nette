@@ -1,6 +1,6 @@
 <?php
 
-namespace UniMapper\Extension\NetteExtension;
+namespace UniMapper\Nette;
 
 class Panel implements \Nette\Diagnostics\IBarPanel
 {
@@ -23,14 +23,14 @@ class Panel implements \Nette\Diagnostics\IBarPanel
                 }
             }
         }
-        require __DIR__ . "/Panel.tab.phtml";
+        require __DIR__ . "/templates/Panel.tab.phtml";
         return ob_get_clean();
     }
 
     public function getPanel()
     {
         ob_start();
-        require __DIR__ . "/Panel.panel.phtml";
+        require __DIR__ . "/templates/Panel.panel.phtml";
         return ob_get_clean();
     }
 

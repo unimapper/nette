@@ -1,14 +1,13 @@
 <?php
 
-namespace UniMapper\Extension;
+namespace UniMapper\Nette;
 
-use Nette\Diagnostics,
-    UniMapper\Exceptions\PropertyException;
+use UniMapper\Exceptions\PropertyException;
 
 /**
  * Nette Framework extension.
  */
-class NetteExtension extends \Nette\Config\CompilerExtension
+class Extension extends \Nette\Config\CompilerExtension
 {
 
     /** @var array $defaults Default configuration */
@@ -26,7 +25,7 @@ class NetteExtension extends \Nette\Config\CompilerExtension
 
         // Cache service
         if ($config["cache"]) {
-            $builder->addDefinition($this->prefix("cache"))->setClass("UniMapper\Extension\NetteCache");
+            $builder->addDefinition($this->prefix("cache"))->setClass("UniMapper\Nette\Cache");
         }
 
         // Debug mode only
@@ -34,14 +33,14 @@ class NetteExtension extends \Nette\Config\CompilerExtension
 
             // Create panel service
             $builder->addDefinition($this->prefix("panel"))
-                ->setClass("UniMapper\Extension\NetteExtension\Panel")
+                ->setClass("UniMapper\Nette\Panel")
                 ->addSetup(
                     'Nette\Diagnostics\Debugger::$bar->addPanel(?)',
                     array('@self')
                 )
                 ->addSetup(
                     'Nette\Diagnostics\Debugger::$blueScreen->addPanel(?)',
-                    array('UniMapper\Extension\NetteExtension::renderException')
+                    array('UniMapper\Nette\Extension::renderException')
                 );
         }
     }
@@ -108,11 +107,11 @@ class NetteExtension extends \Nette\Config\CompilerExtension
         if ($exception instanceof PropertyException
             && $exception->getEntityPath() !== false
         ) {
-            $link = Diagnostics\Helpers::editorLink(
+            $link = \Nette\Diagnostics\Helpers::editorLink(
                 $exception->getEntityPath(),
                 $exception->getEntityLine()
             );
-            $code = Diagnostics\BlueScreen::highlightFile(
+            $code = \Nette\Diagnostics\BlueScreen::highlightFile(
                 $exception->getEntityPath(),
                 $exception->getEntityLine()
             );

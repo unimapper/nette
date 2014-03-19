@@ -15,7 +15,7 @@
                     <td><?php echo round($query->elapsed, 3) ?> ms</td>
                     <td><?php echo get_class($repository) ?></td>
                     <td>
-                        <?php include __DIR__ . '/templates/queries.phtml' ?>
+                        <?php include __DIR__ . '/queries.phtml' ?>
                     </td>
                     <td>
                         <?php if ($query->result instanceof \UniMapper\EntityCollection): ?>
