@@ -61,10 +61,12 @@ class Extension extends \Nette\Config\CompilerExtension
                 );
         }
 
-        // Find registered repositories
+        // Iterate over services
         foreach ($builder->getDefinitions() as $serviceName => $serviceDefinition) {
 
             $class = $serviceDefinition->class !== NULL ? $serviceDefinition->class : $serviceDefinition->factory->entity;
+
+            // Repositories only
             if (class_exists($class) && is_subclass_of($class, "UniMapper\Repository")) {
 
                 $builder->getDefinition($serviceName)->addSetup("setLogger", new \UniMapper\Logger);
@@ -77,6 +79,15 @@ class Extension extends \Nette\Config\CompilerExtension
                 // Register repository into the panel
                 if ($builder->parameters["debugMode"]) {
                     $builder->getDefinition($this->prefix("panel"))->addSetup('registerRepository', "@" . $serviceName);
+                }
+            }
+
+            // Mappers only
+            if (class_exists($class) && is_subclass_of($class, "UniMapper\Mapper")) {
+
+                // Set repository cache
+                if ($config["cache"]) {
+                    $builder->getDefinition($serviceName)->addSetup("setCache", $builder->getDefinition($this->prefix("cache")));
                 }
             }
         }
