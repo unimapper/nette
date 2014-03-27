@@ -1,12 +1,27 @@
 <?php foreach ($query->conditions as $condition) { ?>
+    <?php $isNested = is_array($condition[0]); ?>
     <tr>
         <th>
-            <?php if ($condition[3] === "AND"): ?>
-                where
+            <?php if ($isNested): ?>
+                <?php if ($condition[1] === "AND"): ?>
+                    whereAre
+                <?php else: ?>
+                    orWhereAre
+                <?php endif ?>
             <?php else: ?>
-                or
+                <?php if ($condition[3] === "AND"): ?>
+                    where
+                <?php else: ?>
+                    or
+                <?php endif ?>
             <?php endif ?>
         </th>
-        <td><?php echo $condition[0] ?> <?php echo $condition[1] ?> <?php echo \Nette\Diagnostics\Helpers::clickableDump($condition[2], true) ?></td>
+        <td>
+            <?php if ($isNested): ?>
+               <?php echo \Nette\Diagnostics\Helpers::clickableDump($condition[0], true) ?>
+            <?php else: ?>
+                <?php echo $condition[0] ?> <?php echo $condition[1] ?> <?php echo \Nette\Diagnostics\Helpers::clickableDump($condition[2], true) ?>
+            <?php endif ?>
+        </td>
     </tr>
 <?php } ?>
