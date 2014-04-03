@@ -61,6 +61,9 @@ class Extension extends \Nette\Config\CompilerExtension
                 );
         }
 
+        $mappers = [];
+        $repositories = [];
+
         // Iterate over services
         foreach ($builder->getDefinitions() as $serviceName => $serviceDefinition) {
 
@@ -68,6 +71,8 @@ class Extension extends \Nette\Config\CompilerExtension
 
             // Repositories only
             if (class_exists($class) && is_subclass_of($class, "UniMapper\Repository")) {
+
+                $repositories[] = $serviceName;
 
                 $builder->getDefinition($serviceName)->addSetup("setLogger", new \UniMapper\Logger);
 
@@ -85,10 +90,20 @@ class Extension extends \Nette\Config\CompilerExtension
             // Mappers only
             if (class_exists($class) && is_subclass_of($class, "UniMapper\Mapper")) {
 
+                $mappers[] = $serviceName;
+
                 // Set repository cache
                 if ($config["cache"]) {
                     $builder->getDefinition($serviceName)->addSetup("setCache", $builder->getDefinition($this->prefix("cache")));
                 }
+            }
+        }
+
+        foreach ($repositories as $repository) {
+
+            // Register all mappers
+            foreach ($mappers as $mapper) {
+                $builder->getDefinition($repository)->addSetup("registerMapper", $builder->getDefinition($mapper));
             }
         }
     }
