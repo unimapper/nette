@@ -1,8 +1,8 @@
 <?php if ($query instanceof \UniMapper\Query\Custom): ?>
-    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $queryIndex ?>">
+    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $index ?>">
         <strong>custom ►</strong>
     </a>
-    <div id="unimapper-panel-query-<?php echo $queryIndex ?>" class="nette-collapsed">
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
         <table>
             <tr>
                 <th>Mapper</th>
@@ -22,10 +22,10 @@
         </table>
     </div>
 <?php elseif ($query instanceof \UniMapper\Query\FindAll): ?>
-    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $queryIndex ?>">
+    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $index ?>">
         <strong>findAll ►</strong>
     </a>
-    <div id="unimapper-panel-query-<?php echo $queryIndex ?>" class="nette-collapsed">
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
         <table>
             <?php include __DIR__ . '/queries/selection.phtml' ?>
             <?php include __DIR__ . '/queries/conditions.phtml' ?>
@@ -35,10 +35,10 @@
         </table>
     </div>
 <?php elseif ($query instanceof \UniMapper\Query\FindOne): ?>
-    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $queryIndex ?>">
+    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $index ?>">
         <strong>findOne ►</strong>
     </a>
-    <div id="unimapper-panel-query-<?php echo $queryIndex ?>" class="nette-collapsed">
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
         <table>
             <tr>
                 <th>Primary value</th>
@@ -49,37 +49,37 @@
         </table>
     </div>
 <?php elseif ($query instanceof \UniMapper\Query\Count): ?>
-    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $queryIndex ?>">
+    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $index ?>">
         <strong>count ►</strong>
     </a>
-    <div id="unimapper-panel-query-<?php echo $queryIndex ?>" class="nette-collapsed">
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
         <table>
             <?php include __DIR__ . '/queries/conditions.phtml' ?>
         </table>
     </div>
 <?php elseif ($query instanceof \UniMapper\Query\Delete): ?>
-    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $queryIndex ?>">
+    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $index ?>-">
         <strong>delete ►</strong>
     </a>
-    <div id="unimapper-panel-query-<?php echo $queryIndex ?>" class="nette-collapsed">
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
         <table>
             <?php include __DIR__ . '/queries/conditions.phtml' ?>
         </table>
     </div>
 <?php elseif ($query instanceof \UniMapper\Query\Insert): ?>
-    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $queryIndex ?>">
+    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $index ?>">
         <strong>insert ►</strong>
     </a>
-    <div id="unimapper-panel-query-<?php echo $queryIndex ?>" class="nette-collapsed">
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
         <table>
             <?php include __DIR__ . '/queries/data.phtml' ?>
         </table>
     </div>
 <?php elseif ($query instanceof \UniMapper\Query\Update): ?>
-    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $queryIndex ?>">
+    <a href="#" class="nette-toggler" rel="#unimapper-panel-query-<?php echo $index ?>">
         <strong>update ►</strong>
     </a>
-    <div id="unimapper-panel-query-<?php echo $queryIndex ?>" class="nette-collapsed">
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
         <table>
             <?php include __DIR__ . '/queries/conditions.phtml' ?>
         </table>
