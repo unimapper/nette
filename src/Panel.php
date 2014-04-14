@@ -2,7 +2,10 @@
 
 namespace UniMapper\Nette;
 
-class Panel implements \Nette\Diagnostics\IBarPanel
+use Nette\Diagnostics\Dumper,
+    Nette\Diagnostics\IBarPanel;
+
+class Panel implements IBarPanel
 {
 
     protected $repositories = array();
@@ -14,6 +17,11 @@ class Panel implements \Nette\Diagnostics\IBarPanel
 
     private function getClickable($variable, $collapsed = false)
     {
+        if (class_exists('Nette\Diagnostics\Dumper')) {
+            return Dumper::toHtml($variable, [Dumper::COLLAPSE => $collapsed]);
+        }
+
+        // Nette 2.0 back compatibility
         return \Nette\Diagnostics\Helpers::clickableDump($variable, $collapsed);
     }
 

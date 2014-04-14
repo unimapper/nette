@@ -2,12 +2,24 @@
 
 namespace UniMapper\Nette;
 
-use UniMapper\Exceptions\PropertyException;
+use UniMapper\Exceptions\PropertyException,
+    Nette\Diagnostics\Helpers,
+    Nette\Diagnostics\BlueScreen,
+    Nette\DI\CompilerExtension,
+    Nette\DI\Compiler,
+    Nette\Configurator;
+
+// Nette 2.0 back compatibility
+if (!class_exists('Nette\DI\CompilerExtension')) {
+    class_alias('Nette\Config\CompilerExtension', 'Nette\DI\CompilerExtension');
+    class_alias('Nette\Config\Compiler', 'Nette\DI\Compiler');
+    class_alias('Nette\Config\Helpers', 'Nette\DI\Config\Helpers');
+}
 
 /**
  * Nette Framework extension.
  */
-class Extension extends \Nette\Config\CompilerExtension
+class Extension extends CompilerExtension
 {
 
     /** @var array $defaults Default configuration */
@@ -110,13 +122,11 @@ class Extension extends \Nette\Config\CompilerExtension
 
     /**
      * Register extension
-     *
-     * @param \Nette\Configurator $configurator
      */
-    public static function register(\Nette\Configurator $configurator)
+    public static function register(Configurator $configurator)
     {
         $class = get_class();
-        $configurator->onCompile[] = function ($config, \Nette\Config\Compiler $compiler) use ($class) {
+        $configurator->onCompile[] = function ($config, Compiler $compiler) use ($class) {
             $compiler->addExtension("unimapper", new $class);
         };
     }
@@ -133,11 +143,11 @@ class Extension extends \Nette\Config\CompilerExtension
         if ($exception instanceof PropertyException
             && $exception->getEntityPath() !== false
         ) {
-            $link = \Nette\Diagnostics\Helpers::editorLink(
+            $link = Helpers::editorLink(
                 $exception->getEntityPath(),
                 $exception->getEntityLine()
             );
-            $code = \Nette\Diagnostics\BlueScreen::highlightFile(
+            $code = BlueScreen::highlightFile(
                 $exception->getEntityPath(),
                 $exception->getEntityLine()
             );
