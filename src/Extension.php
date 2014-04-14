@@ -78,7 +78,7 @@ class Extension extends \Nette\Config\CompilerExtension
 
                 // Set repository cache
                 if ($config["cache"]) {
-                    $builder->getDefinition($serviceName)->addSetup("setCache", $builder->getDefinition($this->prefix("cache")));
+                    $builder->getDefinition($serviceName)->addSetup("setCache", [$builder->getDefinition($this->prefix("cache"))]);
                 }
 
                 // Register repository into the panel
