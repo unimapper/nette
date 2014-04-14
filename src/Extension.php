@@ -11,9 +11,9 @@ class Extension extends \Nette\Config\CompilerExtension
 {
 
     /** @var array $defaults Default configuration */
-    public $defaults = array(
+    public $defaults = [
         "cache" => true
-    );
+    ];
 
     /**
      * Processes configuration data
@@ -36,11 +36,11 @@ class Extension extends \Nette\Config\CompilerExtension
                 ->setClass("UniMapper\Nette\Panel")
                 ->addSetup(
                     'Nette\Diagnostics\Debugger::$bar->addPanel(?)',
-                    array('@self')
+                    ['@self']
                 )
                 ->addSetup(
                     'Nette\Diagnostics\Debugger::$blueScreen->addPanel(?)',
-                    array('UniMapper\Nette\Extension::renderException')
+                    ['UniMapper\Nette\Extension::renderException']
                 );
         }
     }
@@ -57,7 +57,7 @@ class Extension extends \Nette\Config\CompilerExtension
             $builder->getDefinition("application")
                 ->addSetup(
                     '$service->onStartup[] = ?',
-                    array(array($this->prefix("@panel"), "getTab"))
+                    [[$this->prefix("@panel"), "getTab"]]
                 );
         }
 
@@ -74,7 +74,7 @@ class Extension extends \Nette\Config\CompilerExtension
 
                 $repositories[] = $serviceName;
 
-                $builder->getDefinition($serviceName)->addSetup("setLogger", new \UniMapper\Logger);
+                $builder->getDefinition($serviceName)->addSetup("setLogger", [new \UniMapper\Logger]);
 
                 // Set repository cache
                 if ($config["cache"]) {
@@ -83,7 +83,7 @@ class Extension extends \Nette\Config\CompilerExtension
 
                 // Register repository into the panel
                 if ($builder->parameters["debugMode"]) {
-                    $builder->getDefinition($this->prefix("panel"))->addSetup('registerRepository', "@" . $serviceName);
+                    $builder->getDefinition($this->prefix("panel"))->addSetup('registerRepository', [$builder->getDefinition($serviceName)]);
                 }
             }
 
@@ -94,7 +94,7 @@ class Extension extends \Nette\Config\CompilerExtension
 
                 // Set repository cache
                 if ($config["cache"]) {
-                    $builder->getDefinition($serviceName)->addSetup("setCache", $builder->getDefinition($this->prefix("cache")));
+                    $builder->getDefinition($serviceName)->addSetup("setCache", [$builder->getDefinition($this->prefix("cache"))]);
                 }
             }
         }
@@ -103,7 +103,7 @@ class Extension extends \Nette\Config\CompilerExtension
 
             // Register all mappers
             foreach ($mappers as $mapper) {
-                $builder->getDefinition($repository)->addSetup("registerMapper", $builder->getDefinition($mapper));
+                $builder->getDefinition($repository)->addSetup("registerMapper", [$builder->getDefinition($mapper)]);
             }
         }
     }
@@ -141,10 +141,10 @@ class Extension extends \Nette\Config\CompilerExtension
                 $exception->getEntityPath(),
                 $exception->getEntityLine()
             );
-            return array(
+            return [
                 "tab" => "Entity",
                 "panel" =>  $link . "\n" . $code
-            );
+            ];
 	}
     }
 

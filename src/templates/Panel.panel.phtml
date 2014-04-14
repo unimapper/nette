@@ -29,17 +29,17 @@
                                 </a>
                                 <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
                                     <?php foreach ($query->result as $entity) { ?>
-                                        <?php echo \Nette\Diagnostics\Helpers::clickableDump($entity->getData(), true) ?>
+                                        <?php echo $this->getClickable($entity->getData(), true) ?>
                                     <?php } ?>
                                 </div>
                             <?php endif ?>
                         <?php elseif ($query->result instanceof \UniMapper\Entity): ?>
                             <a href="#" class="nette-toggler" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo get_class($query->result) ?> ►</a>
                             <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
-                                <?php echo \Nette\Diagnostics\Helpers::clickableDump($query->result->getData(), true) ?>
+                                <?php echo $this->getClickable($query->result->getData(), true) ?>
                             </div>
                         <?php else: ?>
-                            <?php echo \Nette\Diagnostics\Helpers::clickableDump($query->result, true) ?>
+                            <?php echo $this->getClickable($query->result, true) ?>
                         <?php endif ?>
                     </td>
                 </tr>

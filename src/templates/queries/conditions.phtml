@@ -18,9 +18,9 @@
         </th>
         <td>
             <?php if ($isNested): ?>
-               <?php echo \Nette\Diagnostics\Helpers::clickableDump($condition[0], true) ?>
+               <?php echo $this->getClickable($condition[0], true) ?>
             <?php else: ?>
-                <?php echo $condition[0] ?> <?php echo $condition[1] ?> <?php echo \Nette\Diagnostics\Helpers::clickableDump($condition[2], true) ?>
+                <?php echo $condition[0] ?> <?php echo $condition[1] ?> <?php echo $this->getClickable($condition[2], true) ?>
             <?php endif ?>
         </td>
     </tr>

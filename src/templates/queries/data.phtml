@@ -1,6 +1,4 @@
 <tr>
     <th>Data</th>
-    <td><?php echo \Nette\Diagnostics\Helpers::clickableDump($query->data, true) ?></td>
+    <td><?php echo $this->getClickable($query->data, true) ?></td>
 </tr>
-
-

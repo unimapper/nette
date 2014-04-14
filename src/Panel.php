@@ -12,6 +12,11 @@ class Panel implements \Nette\Diagnostics\IBarPanel
         $this->repositories[] = $repository;
     }
 
+    private function getClickable($variable, $collapsed = false)
+    {
+        return \Nette\Diagnostics\Helpers::clickableDump($variable, $collapsed);
+    }
+
     public function getTab()
     {
         ob_start();
