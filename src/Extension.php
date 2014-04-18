@@ -6,7 +6,7 @@ use UniMapper\Exceptions\PropertyException,
     Nette\Diagnostics\Helpers,
     Nette\Diagnostics\BlueScreen,
     Nette\DI\CompilerExtension,
-    Nette\Utils\PhpGenerator\ClassType,
+    Nette\PhpGenerator\ClassType,
     Nette\DI\Compiler,
     Nette\Configurator;
 
@@ -15,7 +15,7 @@ if (!class_exists('Nette\DI\CompilerExtension')) {
     class_alias('Nette\Config\CompilerExtension', 'Nette\DI\CompilerExtension');
     class_alias('Nette\Config\Compiler', 'Nette\DI\Compiler');
     class_alias('Nette\Config\Helpers', 'Nette\DI\Config\Helpers');
-    class_alias('Nette\Utils\PhpGenerator\ClassType', 'Nette\Utils\PhpGenerator\ClassType');
+    class_alias('Nette\Utils\PhpGenerator\ClassType', 'Nette\PhpGenerator\ClassType');
 }
 
 /**
