@@ -1,3 +1,6 @@
+<?php
+use UniMapper\NamingConvention as NC;
+?>
 <h1>UniMapper queries</h1>
 <div class="nette-inner">
     <table>
@@ -14,7 +17,7 @@
                 <?php if ($query->result !== null): ?>
                 <tr>
                     <td><?php echo round($query->elapsed, 3) ?> ms</td>
-                    <td><?php echo get_class($repository) ?></td>
+                    <td><?php echo $repository->getName() ?></td>
                     <td>
                         <?php include __DIR__ . '/queries.phtml' ?>
                     </td>
@@ -34,7 +37,7 @@
                                 </div>
                             <?php endif ?>
                         <?php elseif ($query->result instanceof \UniMapper\Entity): ?>
-                            <a href="#" class="nette-toggler" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo get_class($query->result) ?> ►</a>
+                                <a href="#" class="nette-toggler" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo NC::classToName(get_class($query->result), NC::$entityMask) ?> ►</a>
                             <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
                                 <?php echo $this->getClickable($query->result->getData(), true) ?>
                             </div>
