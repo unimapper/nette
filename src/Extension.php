@@ -6,6 +6,7 @@ use UniMapper\Exceptions\PropertyException,
     Nette\Diagnostics\Helpers,
     Nette\Diagnostics\BlueScreen,
     Nette\DI\CompilerExtension,
+    Nette\Utils\PhpGenerator\ClassType,
     Nette\DI\Compiler,
     Nette\Configurator;
 
@@ -14,6 +15,7 @@ if (!class_exists('Nette\DI\CompilerExtension')) {
     class_alias('Nette\Config\CompilerExtension', 'Nette\DI\CompilerExtension');
     class_alias('Nette\Config\Compiler', 'Nette\DI\Compiler');
     class_alias('Nette\Config\Helpers', 'Nette\DI\Config\Helpers');
+    class_alias('Nette\Utils\PhpGenerator\ClassType', 'Nette\Utils\PhpGenerator\ClassType');
 }
 
 /**
@@ -24,7 +26,11 @@ class Extension extends CompilerExtension
 
     /** @var array $defaults Default configuration */
     public $defaults = [
-        "cache" => true
+        "cache" => true,
+        "namingConvention" => [
+            "repository" => null,
+            "entity" => null
+        ]
     ];
 
     /**
@@ -117,6 +123,26 @@ class Extension extends CompilerExtension
             foreach ($mappers as $mapper) {
                 $builder->getDefinition($repository)->addSetup("registerMapper", [$builder->getDefinition($mapper)]);
             }
+        }
+    }
+
+    public function afterCompile(ClassType $class)
+    {
+        $config = $this->getConfig($this->defaults);
+        $initialize = $class->methods['initialize'];
+
+        // Naming convention
+        if ($config["namingConvention"]["entity"]) {
+            $initialize->addBody(
+                'UniMapper\NamingConvention::$entityMask = ?;',
+                [$config["namingConvention"]["entity"]]
+            );
+        }
+        if ($config["namingConvention"]["repository"]) {
+            $initialize->addBody(
+                'UniMapper\NamingConvention::$repositoryMask = ?;',
+                [$config["namingConvention"]["repository"]]
+            );
         }
     }
 

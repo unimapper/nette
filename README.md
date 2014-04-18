@@ -33,4 +33,7 @@ return $configurator->createContainer();
 ```yml
 unimapper:
     cache: false # (default = true)
+    namingConvention:
+        entity: 'YourApp\Model\*'
+        repository: 'YourApp\Repository\*Repository'
 ```
