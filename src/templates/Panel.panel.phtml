@@ -22,13 +22,14 @@ use UniMapper\NamingConvention as NC;
                         <?php include __DIR__ . '/queries.phtml' ?>
                     </td>
                     <td>
+                        <!-- result -->
                         <?php if ($query->result instanceof \UniMapper\EntityCollection): ?>
                             <?php if (count($query->result) === 0): ?>
                                 [0] <?php echo NC::classToName($query->result->getEntityClass(), NC::$entityMask) ?>
                             <?php else: ?>
-                                <a href="#" class="nette-toggler" rel="#unimapper-panel-result-<?php echo $index ?>">
+                                <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>">
                                     [<?php echo count($query->result) ?>]
-                                    <?php echo NC::classToName($query->result->getEntityClass(), NC::$entityMask) ?> ►
+                                    <?php echo NC::classToName($query->result->getEntityClass(), NC::$entityMask) ?>
                                 </a>
                                 <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
                                     <?php foreach ($query->result as $entity) { ?>
@@ -37,7 +38,7 @@ use UniMapper\NamingConvention as NC;
                                 </div>
                             <?php endif ?>
                         <?php elseif ($query->result instanceof \UniMapper\Entity): ?>
-                            <a href="#" class="nette-toggler" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo NC::classToName(get_class($query->result), NC::$entityMask) ?> ►</a>
+                            <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo NC::classToName(get_class($query->result), NC::$entityMask) ?></a>
                             <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
                                 <?php echo $this->getClickable($query->result->getData(), true) ?>
                             </div>
