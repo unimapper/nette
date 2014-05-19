@@ -31,7 +31,7 @@ class Panel implements IBarPanel
         $count = 0;
         foreach ($this->repositories as $repository) {
             foreach ($repository->getLogger()->getQueries() as $query) {
-                if ($query->result !== null) {
+                if ($query->getResult() !== null) {
                     $count++;
                 }
             }

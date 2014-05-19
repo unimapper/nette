@@ -14,7 +14,7 @@ use UniMapper\NamingConvention as NC;
         <?php foreach ($this->repositories as $repositoryIndex => $repository): ?>
             <?php foreach ($repository->getLogger()->getQueries() as $queryIndex => $query): ?>
                 <?php $index = $repositoryIndex . "-" . $queryIndex ?>
-                <?php if ($query->result !== null): ?>
+                <?php if ($query->getResult() !== null): ?>
                 <tr>
                     <td><?php echo round($query->elapsed, 3) ?> ms</td>
                     <td><?php echo $repository->getName() ?></td>
@@ -23,27 +23,27 @@ use UniMapper\NamingConvention as NC;
                     </td>
                     <td>
                         <!-- result -->
-                        <?php if ($query->result instanceof \UniMapper\EntityCollection): ?>
-                            <?php if (count($query->result) === 0): ?>
-                                [0] <?php echo NC::classToName($query->result->getEntityClass(), NC::$entityMask) ?>
+                        <?php if ($query->getResult() instanceof \UniMapper\EntityCollection): ?>
+                            <?php if (count($query->getResult()) === 0): ?>
+                                [0] <?php echo NC::classToName($query->getResult()->getEntityClass(), NC::$entityMask) ?>
                             <?php else: ?>
                                 <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>">
-                                    [<?php echo count($query->result) ?>]
-                                    <?php echo NC::classToName($query->result->getEntityClass(), NC::$entityMask) ?>
+                                    [<?php echo count($query->getResult()) ?>]
+                                    <?php echo NC::classToName($query->getResult()->getEntityClass(), NC::$entityMask) ?>
                                 </a>
                                 <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
-                                    <?php foreach ($query->result as $entity) { ?>
+                                    <?php foreach ($query->getResult() as $entity) { ?>
                                         <?php echo $this->getClickable($entity->toArray(true), true) ?>
                                     <?php } ?>
                                 </div>
                             <?php endif ?>
-                        <?php elseif ($query->result instanceof \UniMapper\Entity): ?>
-                            <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo NC::classToName(get_class($query->result), NC::$entityMask) ?></a>
+                        <?php elseif ($query->getResult() instanceof \UniMapper\Entity): ?>
+                            <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo NC::classToName(get_class($query->getResult()), NC::$entityMask) ?></a>
                             <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
-                                <?php echo $this->getClickable($query->result->toArray(true), true) ?>
+                                <?php echo $this->getClickable($query->getResult()->toArray(true), true) ?>
                             </div>
                         <?php else: ?>
-                            <?php echo $this->getClickable($query->result, true) ?>
+                            <?php echo $this->getClickable($query->getResult(), true) ?>
                         <?php endif ?>
                     </td>
                 </tr>
