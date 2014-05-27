@@ -1,4 +1,4 @@
-<?php foreach ($query->conditions as $condition) { ?>
+<?php foreach ($query->getConditions() as $condition) { ?>
     <?php $isNested = is_array($condition[0]); ?>
     <tr>
         <th>

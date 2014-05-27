@@ -16,7 +16,7 @@ use UniMapper\NamingConvention as NC;
                 <?php $index = $repositoryIndex . "-" . $queryIndex ?>
                 <?php if ($query->getResult() !== null): ?>
                 <tr>
-                    <td><?php echo round($query->elapsed, 3) ?> ms</td>
+                    <td><?php echo round($query->getElapsed(), 3) ?> ms</td>
                     <td><?php echo $repository->getName() ?></td>
                     <td>
                         <?php include __DIR__ . '/queries.phtml' ?>
