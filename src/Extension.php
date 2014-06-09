@@ -50,16 +50,16 @@ class Extension extends CompilerExtension
         if ($builder->parameters["debugMode"]) {
 
             // Create panel service
-            $builder->addDefinition($this->prefix("panel"))
-                ->setClass("UniMapper\Nette\Panel")
-                ->addSetup(
-                    'Nette\Diagnostics\Debugger::$bar->addPanel(?)',
-                    ['@self']
-                )
-                ->addSetup(
-                    'Nette\Diagnostics\Debugger::$blueScreen->addPanel(?)',
-                    ['UniMapper\Nette\Extension::renderException']
-                );
+            $panel = $builder->addDefinition($this->prefix("panel"))
+                ->setClass("UniMapper\Nette\Panel");
+
+            if (class_exists("Tracy\Debugger")) {
+                $panel->addSetup('Tracy\Debugger::getBar()->addPanel(?)', ['@self'])
+                      ->addSetup('Tracy\Debugger::getBlueScreen()->addPanel(?)', ['UniMapper\Nette\Extension::renderException']);
+            } else {
+                $panel->addSetup('Nette\Diagnostics\Debugger::$bar->addPanel(?)', ['@self'])
+                      ->addSetup('Nette\Diagnostics\Debugger::$blueScreen->addPanel(?)', ['UniMapper\Nette\Extension::renderException']);
+            }
         }
     }
 
