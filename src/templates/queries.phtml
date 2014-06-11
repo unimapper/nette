@@ -1,3 +1,6 @@
+<?php
+use UniMapper\NamingConvention as NC;
+?>
 <?php if ($query instanceof \UniMapper\Query\Custom): ?>
     <a href="#unimapper-panel-query-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
         <strong>custom</strong>
@@ -5,8 +8,8 @@
     <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
         <table>
             <tr>
-                <th>Mapper</th>
-                <td><?php echo $query->getMapper()->getName() ?></td>
+                <th>Entity</th>
+                <td><?php echo NC::classToName($query->getEntityReflection()->getClassName(), NC::$entityMask) ?></td>
             </tr>
             <tr>
                 <th>Method</th>
