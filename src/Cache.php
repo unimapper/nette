@@ -2,15 +2,17 @@
 
 namespace UniMapper\Nette;
 
-class Cache implements \UniMapper\Cache\ICache
+use Nette\Caching;
+
+class Cache extends \UniMapper\Cache
 {
 
     /** @var \Nette\Caching\Cache */
     protected $cache;
 
-    public function __construct(\Nette\Caching\IStorage $storage)
+    public function __construct(Caching\IStorage $storage)
     {
-        $this->cache = new \Nette\Caching\Cache($storage, "UniMapper.Cache");
+        $this->cache = new Caching\Cache($storage, "UniMapper.Cache");
     }
 
     public function load($key)
@@ -27,7 +29,7 @@ class Cache implements \UniMapper\Cache\ICache
     {
         $dependencies = array();
         if ($file !== null) {
-            $dependencies[\Nette\Caching\Cache::FILES] = $file;
+            $dependencies[Caching\Cache::FILES] = $file;
         }
         $this->cache->save($key, $data, $dependencies);
     }
