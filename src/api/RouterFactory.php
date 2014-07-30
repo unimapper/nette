@@ -10,7 +10,7 @@ use Nette\Application\Routers\RouteList,
 class RouterFactory
 {
 
-    public static function prependTo(IRouter &$router, RepositoryList $repositories, $module)
+    public static function prependTo(IRouter &$router, $module)
     {
         if (!$router instanceof RouteList) {
             throw new \Exception(

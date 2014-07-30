@@ -144,8 +144,8 @@ class Extension extends CompilerExtension
 
             $builder->getDefinition("router")
                 ->addSetup(
-                    'UniMapper\Nette\Api\RouterFactory::prependTo($service, $this->getService(?), ?)',
-                    [$this->prefix("repositories"), $config['api']['module']]
+                    'UniMapper\Nette\Api\RouterFactory::prependTo($service, ?)',
+                    [$config['api']['module']]
                 );
         }
     }
