@@ -1,0 +1,18 @@
+nette:
+    application:
+        mapping:
+            *: UniMapper\Nette\Tests\*Module\*Presenter
+
+extensions:
+    unimapper: UniMapper\Nette\Extension
+
+unimapper:
+    namingConvention:
+        repository: 'UniMapper\Nette\Tests\Model\Repository\*Repository'
+        entity: 'UniMapper\Nette\Tests\Model\Entity\*'
+    api:
+        enabled: true
+
+services:
+    simpleRepository: UniMapper\Nette\Tests\Model\Repository\SimpleRepository
+    simpleMapper: UniMapper\Nette\Tests\Model\Mapper\SimpleMapper('SimpleMapper')
