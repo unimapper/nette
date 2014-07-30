@@ -161,6 +161,15 @@ class ApiTest extends Tester\TestCase
         Assert::same(['success' => true], $response->getPayload());
     }
 
+    public function testCustomGetAction()
+    {
+        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ['id' => 'customGet']);
+        $response = $this->presenter->run($request);
+        Assert::type("Nette\Application\Responses\JsonResponse", $response);
+        Assert::same("application/json", $response->getContentType());
+        Assert::true($response->getPayload()["success"]);
+    }
+
 }
 
 $testCase = new ApiTest($configurator->createContainer());

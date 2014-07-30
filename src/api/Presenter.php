@@ -67,6 +67,14 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             );
         }
         $this->repository = $this->repositories[$name];
+
+        $id = $this->getParameter("id");
+        if ($id) {
+
+            if ($this->getReflection()->hasCallableMethod(self::formatActionMethod($id))) {
+                $this->changeAction($id);
+            }
+        }
     }
 
     public function actionDefault($id = null)
