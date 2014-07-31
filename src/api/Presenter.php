@@ -118,9 +118,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             ->getPrimaryProperty()
             ->convertValue($id);
 
-        $entity = $this->repository->query()
-            ->findOne($primaryValue)
-            ->execute();
+        $entity = $this->repository->findOne($primaryValue);
 
         $result = [];
         if (!$entity) {
