@@ -90,7 +90,7 @@ class Extension extends CompilerExtension
                 );
         }
 
-        $mappers = [];
+        $adapters = [];
         $repositories = [];
 
         // Iterate over services
@@ -116,23 +116,23 @@ class Extension extends CompilerExtension
                 }
             }
 
-            // Mappers only
-            if (class_exists($class) && is_subclass_of($class, "UniMapper\Mapper")) {
+            // Adapters only
+            if (class_exists($class) && is_subclass_of($class, "UniMapper\Adapter")) {
 
-                $mappers[] = $serviceName;
+                $adapters[] = $serviceName;
 
-                // Set repository cache
+                // Set adapter cache
                 if ($config["cache"]) {
                     $builder->getDefinition($serviceName)->addSetup("setCache", [$builder->getDefinition($this->prefix("cache"))]);
                 }
             }
         }
 
-        // Register all mappers
+        // Register all adapters
         foreach ($repositories as $repository) {
 
-            foreach ($mappers as $mapper) {
-                $builder->getDefinition($repository)->addSetup("registerMapper", [$builder->getDefinition($mapper)]);
+            foreach ($adapters as $adapter) {
+                $builder->getDefinition($repository)->addSetup("registerAdapter", [$builder->getDefinition($adapter)]);
             }
 
             $builder->getDefinition($this->prefix("repositories"))
