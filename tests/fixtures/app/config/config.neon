@@ -15,4 +15,5 @@ unimapper:
 
 services:
     simpleRepository: UniMapper\Nette\Tests\Model\Repository\SimpleRepository
-    simpleMapper: UniMapper\Nette\Tests\Model\Mapper\SimpleMapper('SimpleMapper')
+    mapping: UniMapper\Mapping
+    simpleAdapter: UniMapper\Nette\Tests\Model\Adapter\SimpleAdapter('SimpleAdapter', @mapping)
