@@ -38,4 +38,7 @@ unimapper:
     namingConvention:
         entity: 'YourApp\Model\*'
         repository: 'YourApp\Repository\*Repository'
+    api:
+        enabled: true
+        module: "Api"
 ```
