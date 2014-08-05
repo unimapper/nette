@@ -1,8 +1,8 @@
 <?php
 
-namespace UniMapper\Nette\Tests\Model\Mapper;
+namespace UniMapper\Nette\Tests\Model\Adapter;
 
-class SimpleMapper extends \UniMapper\Mapper
+class SimpleAdapter extends \UniMapper\Adapter
 {
 
     public function count($resource, array $conditions)

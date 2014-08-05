@@ -3,7 +3,7 @@
 namespace UniMapper\Nette\Tests\Model\Entity;
 
 /**
- * @mapper SimpleMapper(test_resource)
+ * @adapter SimpleAdapter(test_resource)
  *
  * @property integer $id m:primary
  * @property string  $text
