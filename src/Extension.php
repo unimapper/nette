@@ -34,7 +34,8 @@ class Extension extends CompilerExtension
         "api" => [
             "enabled" => false,
             "module" => "Api"
-        ]
+        ],
+        "customQueries" => []
     ];
 
     /**
@@ -103,11 +104,19 @@ class Extension extends CompilerExtension
 
                 $repositories[] = $serviceName;
 
-                $builder->getDefinition($serviceName)->addSetup("setLogger", [new \UniMapper\Logger]);
+                $repositoryDefinition = $builder->getDefinition($serviceName);
+
+                // Set logger
+                $repositoryDefinition->addSetup("setLogger", [new \UniMapper\Logger]);
 
                 // Set repository cache
                 if ($config["cache"]) {
-                    $builder->getDefinition($serviceName)->addSetup("setCache", [$builder->getDefinition($this->prefix("cache"))]);
+                    $repositoryDefinition->addSetup("setCache", [$builder->getDefinition($this->prefix("cache"))]);
+                }
+
+                // Register custom queries
+                foreach ($config["customQueries"] as $customQueryClass) {
+                    $repositoryDefinition->addSetup("registerCustomQuery", [$customQueryClass]);
                 }
 
                 // Register repository into the panel

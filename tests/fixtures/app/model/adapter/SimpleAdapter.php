@@ -5,12 +5,12 @@ namespace UniMapper\Nette\Tests\Model\Adapter;
 class SimpleAdapter extends \UniMapper\Adapter
 {
 
-    public function count($resource, array $conditions)
+    public function count($resource, $conditions = null)
     {
         throw new \Exception("You should  mock here!");
     }
 
-    public function delete($resource, array $conditions)
+    public function delete($resource, $conditions)
     {
         throw new \Exception("You should  mock here!");
     }
@@ -20,7 +20,7 @@ class SimpleAdapter extends \UniMapper\Adapter
         throw new \Exception("You should  mock here!");
     }
 
-    public function findAll($resource, array $selection = [], array $conditions = [], array $orderBy = [], $limit = 0, $offset = 0, array $associations = [])
+    public function findAll($resource, $selection = null, $conditions = null, $orderBy = null, $limit = 0, $offset = 0, array $associations = [])
     {
         throw new \Exception("You should  mock here!");
     }
@@ -30,17 +30,12 @@ class SimpleAdapter extends \UniMapper\Adapter
         throw new \Exception("You should  mock here!");
     }
 
-    public function update($resource, array $values, array $conditions)
+    public function update($resource, array $values, $conditions = null)
     {
         throw new \Exception("You should  mock here!");
     }
 
     public function updateOne($resource, $primaryName, $primaryValue, array $values)
-    {
-        throw new \Exception("You should  mock here!");
-    }
-
-    public function custom($resource, $query, $method, $contentType, $data)
     {
         throw new \Exception("You should  mock here!");
     }
