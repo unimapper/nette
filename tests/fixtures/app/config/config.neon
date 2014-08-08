@@ -12,6 +12,8 @@ unimapper:
         entity: 'UniMapper\Nette\Tests\Model\Entity\*'
     api:
         enabled: true
+    customQueries:
+        - UniMapper\Nette\Tests\Model\Query\Custom
 
 services:
     simpleRepository: UniMapper\Nette\Tests\Model\Repository\SimpleRepository
