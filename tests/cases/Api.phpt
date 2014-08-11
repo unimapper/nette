@@ -115,7 +115,7 @@ class ApiTest extends Tester\TestCase
 
     public function testFind()
     {
-        $this->adapterMock->shouldReceive("findAll")
+        $this->adapterMock->shouldReceive("find")
             ->with("test_resource", ["id", "text"], [], [], 10, 0, [])
             ->once()
             ->andReturn([["text" => "foo", "id" => 1], ["text" => "foo2", "id" => 2]]);

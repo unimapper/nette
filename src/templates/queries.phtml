@@ -27,9 +27,9 @@ use UniMapper\NamingConvention as NC;
             <?php endif ?>
         </table>
     </div>
-<?php elseif ($query instanceof \UniMapper\Query\FindAll): ?>
+<?php elseif ($query instanceof \UniMapper\Query\Find): ?>
     <a href="#unimapper-panel-query-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
-        <strong>findAll</strong>
+        <strong>find</strong>
     </a>
     <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
         <table>
