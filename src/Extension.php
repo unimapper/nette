@@ -2,7 +2,7 @@
 
 namespace UniMapper\Nette;
 
-use UniMapper\Exceptions\PropertyException,
+use UniMapper\Exception\PropertyException,
     Nette\Diagnostics\Helpers,
     Nette\Diagnostics\BlueScreen,
     Nette\DI\CompilerExtension,
