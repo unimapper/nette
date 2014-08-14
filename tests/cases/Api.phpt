@@ -40,25 +40,23 @@ class ApiTest extends Tester\TestCase
         $this->inputMock->shouldReceive("getData")->once()->andReturn('{"text": "foo"}');
         $this->adapterMock->shouldReceive("insert")->once()->andReturn(1);
 
-        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::POST, []);
+        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::POST, ["action" => "post"]);
         $response = $this->presenter->run($request);
         Assert::type("Nette\Application\Responses\JsonResponse", $response);
         Assert::same("application/json", $response->getContentType());
-        Assert::same(
-            array(
-                'success' => true,
-                'link' => '/api/simple/1?action=default',
-                'body' => array('id' => 1, 'text' => "foo")
-            ),
-            $response->getPayload()
-        );
+
+        $payload = $response->getPayload();
+        Assert::type("UniMapper\Nette\Api\Resource", $payload);
+        Assert::true($payload->success);
+        Assert::same('/api/simple/1', $payload->link);
+        Assert::same(['id' => 1, 'text' => "foo"], $payload->body);
     }
 
     public function testCreateInvalid()
     {
         $this->inputMock->shouldReceive("getData")->once()->andReturn(null);
 
-        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::POST, []);
+        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::POST, ["action" => "post"]);
         $response = $this->presenter->run($request);
         Assert::type("Nette\Application\Responses\JsonResponse", $response);
         Assert::same("application/json", $response->getContentType());
@@ -85,7 +83,7 @@ class ApiTest extends Tester\TestCase
      */
     public function testNoRepository()
     {
-        $request = new Nette\Application\Request('Api:NoRepository', Nette\Http\Request::GET, []);
+        $request = new Nette\Application\Request('Api:NoRepository', Nette\Http\Request::GET, ["action" => "get"]);
         $this->presenter->run($request);
     }
 
@@ -93,13 +91,15 @@ class ApiTest extends Tester\TestCase
     {
         $this->adapterMock->shouldReceive("findOne")->once()->andReturn(["text" => "foo", "id" => 1]);
 
-        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ['id' => 1]);
+        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ['id' => 1, "action" => "get"]);
         $response = $this->presenter->run($request);
         Assert::type("Nette\Application\Responses\JsonResponse", $response);
         Assert::same("application/json", $response->getContentType());
-        Assert::type("UniMapper\Nette\Tests\Model\Entity\Simple", $response->getPayload()["body"]);
-        Assert::same(1, $response->getPayload()["body"]->id);
-        Assert::same("foo", $response->getPayload()["body"]->text);
+
+        $payload = $response->getPayload();
+        Assert::type("UniMapper\Nette\Tests\Model\Entity\Simple", $payload->body);
+        Assert::same(1, $payload->body->id);
+        Assert::same("foo", $payload->body->text);
     }
 
     /**
@@ -109,7 +109,7 @@ class ApiTest extends Tester\TestCase
     {
         $this->adapterMock->shouldReceive("findOne")->once()->andReturn(false);
 
-        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ['id' => 1]);
+        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ['id' => 1, "action" => "get"]);
         $this->presenter->run($request);
     }
 
@@ -120,16 +120,16 @@ class ApiTest extends Tester\TestCase
             ->once()
             ->andReturn([["text" => "foo", "id" => 1], ["text" => "foo2", "id" => 2]]);
 
-        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, []);
+        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ["action" => "get"]);
         $response = $this->presenter->run($request);
         Assert::type("Nette\Application\Responses\JsonResponse", $response);
         Assert::same("application/json", $response->getContentType());
-        Assert::type("UniMapper\EntityCollection", $response->getPayload()["body"]);
-        Assert::count(2, $response->getPayload()["body"]);
-        Assert::same("foo", $response->getPayload()["body"][0]->text);
-        Assert::same("foo2", $response->getPayload()["body"][1]->text);
-        Assert::same(1, $response->getPayload()["body"][0]->id);
-        Assert::same(2, $response->getPayload()["body"][1]->id);
+        Assert::type("UniMapper\EntityCollection", $response->getPayload()->body);
+        Assert::count(2, $response->getPayload()->body);
+        Assert::same("foo", $response->getPayload()->body[0]->text);
+        Assert::same("foo2", $response->getPayload()->body[1]->text);
+        Assert::same(1, $response->getPayload()->body[0]->id);
+        Assert::same(2, $response->getPayload()->body[1]->id);
     }
 
     public function testUpdate()
@@ -137,38 +137,45 @@ class ApiTest extends Tester\TestCase
         $this->inputMock->shouldReceive("getData")->once()->andReturn('{"text": "foo"}');
         $this->adapterMock->shouldReceive("updateOne")->with("test_resource", "id", 1, ["text" => "foo"])->once()->andReturn(null);
 
-        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::PUT, ['id' => 1]);
+        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::PUT, ['id' => 1, "action" => "put"]);
         $response = $this->presenter->run($request);
         Assert::type("Nette\Application\Responses\JsonResponse", $response);
         Assert::same("application/json", $response->getContentType());
-        Assert::same(
-            array(
-                'success' => true,
-                'link' => '/api/simple/1?action=default',
-                'body' => array('id' => 1, 'text' => "foo")
-            ),
-            $response->getPayload()
-        );
+
+        $payload = $response->getPayload();
+        Assert::type("UniMapper\Nette\Api\Resource", $payload);
+        Assert::true($payload->success);
+        Assert::same('/api/simple/1', $payload->link);
+        Assert::same(['id' => 1, 'text' => "foo"], $payload->body);
     }
 
     public function testDestroy()
     {
         $this->adapterMock->shouldReceive("delete")->with("test_resource", [["id", "=", 1, "AND"]])->once()->andReturn(null);
 
-        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::DELETE, ['id' => 1]);
+        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::DELETE, ['id' => 1, "action" => "delete"]);
         $response = $this->presenter->run($request);
         Assert::type("Nette\Application\Responses\JsonResponse", $response);
         Assert::same("application/json", $response->getContentType());
-        Assert::same(['success' => true], $response->getPayload());
+        Assert::true($response->getPayload()->success);
     }
 
     public function testCustomGetAction()
     {
-        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ['id' => 'customGet']);
+        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ['id' => 1, "action" => "customGet"]);
         $response = $this->presenter->run($request);
         Assert::type("Nette\Application\Responses\JsonResponse", $response);
         Assert::same("application/json", $response->getContentType());
-        Assert::true($response->getPayload()["success"]);
+        Assert::same(["success" => true, "id" => 1], $response->getPayload());
+    }
+
+    public function testLink()
+    {
+        Assert::same("/api/simple", $this->presenter->link(":Api:Simple:get"));
+        Assert::same("/api/simple/1", $this->presenter->link(":Api:Simple:get", 1));
+        Assert::same("/api/simple", $this->presenter->link(":Api:Simple:post"));
+        Assert::same("/api/simple", $this->presenter->link(":Api:Simple:put"));
+        Assert::same("/api/simple", $this->presenter->link(":Api:Simple:delete"));
     }
 
 }

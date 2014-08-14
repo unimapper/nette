@@ -14,7 +14,7 @@ Tester\Environment::setup();
 date_default_timezone_set('Europe/Prague');
 
 // create temporary directory
-$tempDir = __DIR__ . '/temp/';
+$tempDir = __DIR__ . '/temp/' . getmypid();
 @mkdir(dirname($tempDir));
 Tester\Helpers::purge($tempDir);
 

@@ -3,9 +3,7 @@
 namespace UniMapper\Nette\Api;
 
 use Nette\Application\Routers\RouteList,
-    Nette\Application\IRouter,
-    Nette\Utils\Strings,
-    Nette\Application\Routers\Route;
+    Nette\Application\IRouter;
 
 class RouterFactory
 {
@@ -18,8 +16,8 @@ class RouterFactory
             );
         }
 
-        $apiRouter = new RouteList($module);
-        $apiRouter[] = new Route(Strings::webalize($module) . "/<presenter>[/<id>]");
+        $apiRouter = new RouteList;
+        $apiRouter[] = new Route($module);
         $router[] = $apiRouter; // need to increase the array size
 
         $lastKey = count($router) - 1;

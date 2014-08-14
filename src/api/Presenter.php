@@ -3,7 +3,6 @@
 namespace UniMapper\Nette\Api;
 
 use Nette\Application\Responses\JsonResponse,
-    Nette\Http\Request,
     Nette\Http\Response,
     Nette\Utils\Json,
     UniMapper\Nette\Api\RepositoryList;
@@ -20,11 +19,17 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     /** @var \Nette\Http\Response $httpResponse */
     private $httpResponse;
 
+    /** @var integer $maxLimit */
+    protected $maxLimit = 10;
+
+    /** @var \UniMapper\Nette\Api\Resource $resource */
+    protected $resource;
+
     /** @var \UniMapper\Nette\Api\Input $input */
     private $input;
 
-    /** @var integer $maxLimit */
-    protected $maxLimit = 10;
+    /** @var array $data Input data */
+    protected $data;
 
     /**
      * Inject repositories
@@ -37,16 +42,6 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     }
 
     /**
-     * Inject input
-     *
-     * @param \UniMapper\Nette\Api\Input $input
-     */
-    public function injectInput(Input $input)
-    {
-        $this->input = $input;
-    }
-
-    /**
      * Inject HTTP response
      *
      * @param \Nette\Http\Response $httpResponse
@@ -56,9 +51,22 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         $this->httpResponse = $httpResponse;
     }
 
+    /**
+     * Inject input
+     *
+     * @param \UniMapper\Nette\Api\Input $input
+     */
+    public function injectInput(Input $input)
+    {
+        $this->input = $input;
+    }
+
     public function startup()
     {
         parent::startup();
+
+        $this->resource = new Resource;
+
         $name = $this->getPresenterName();
         if (!isset($this->repositories[$name])) {
             $this->error(
@@ -68,71 +76,35 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         }
         $this->repository = $this->repositories[$name];
 
-        $id = $this->getParameter("id");
+        $this->data = Json::decode($this->input->getData(), Json::FORCE_ARRAY);
+    }
+
+    public function actionGet($id = null)
+    {
         if ($id) {
 
-            if ($this->getReflection()->hasCallableMethod(self::formatActionMethod($id))) {
-                $this->changeAction($id);
+            // @todo catch unsuccessfull convert
+            $primaryValue = $this->repository->createEntity()
+                ->getReflection()
+                ->getPrimaryProperty()
+                ->convertValue($id);
+
+            $entity = $this->repository->findOne($primaryValue);
+
+            if (!$entity) {
+                $this->error("Resource not found!", Response::S404_NOT_FOUND);
             }
-        }
-    }
 
-    public function actionDefault($id = null)
-    {
-        $method = $this->getRequest()->getMethod();
-        if ($method === Request::GET && !$id) {
-            $result = $this->find(
-                $this->getParameter("limit"),
-                $this->getParameter("offset")
-            );
-        } elseif ($method === Request::GET && $id) {
-            $result = $this->findOne($id);
-        } elseif ($method === Request::POST && !$id) {
-            $result = $this->create($this->getJsonData());
-        } elseif ($method === Request::PUT && $id) {
-            $result = $this->update($id, $this->getJsonData());
-        } elseif ($method === Request::DELETE && $id) {
-            $result = $this->destroy($id);
+            $this->resource->body = $entity;
         } else {
-            $this->error("Invalid request", Response::S400_BAD_REQUEST);
+            $this->resource->body = $this->repository->find([], [], $this->getLimit(), $this->getOffset());
         }
-
-        $this->sendJsonData($result);
     }
 
-    protected function find($limit = 0, $offset = 0)
-    {
-        $limit = (int) $limit;
-        if ($limit > $this->maxLimit || $limit < 1) {
-            $limit = $this->maxLimit;
-        }
-
-        return ["body" => $this->repository->find([], [], $limit, (int) $offset)];
-    }
-
-    protected function findOne($id)
+    public function actionPost()
     {
         // @todo catch unsuccessfull convert
-        $primaryValue = $this->repository->createEntity()
-            ->getReflection()
-            ->getPrimaryProperty()
-            ->convertValue($id);
-
-        $entity = $this->repository->findOne($primaryValue);
-
-        $result = [];
-        if (!$entity) {
-            $this->error("Resource not found!", Response::S404_NOT_FOUND);
-        } else {
-            $result["body"] = $entity;
-        }
-        return $result;
-    }
-
-    protected function create(array $data)
-    {
-        // @todo catch unsuccessfull convert
-        $entity = $this->repository->createEntity($data);
+        $entity = $this->repository->createEntity($this->data);
 
         if (!$entity->getReflection()->hasPrimaryProperty()) {
             $this->error("Can not create record if entity has no primary property defined!", Response::S405_METHOD_NOT_ALLOWED);
@@ -149,25 +121,24 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
             // Validation failed
             $this->httpResponse->setCode(Response::S400_BAD_REQUEST);
-            return [
-                "success" => false,
-                "messages" => $exception->getValidator()->getMessages()
-            ];
+
+            $this->resource->success = false;
+            $this->resource->messages = $exception->getValidator()->getMessages();
+            return;
         }
 
         // Success
         $this->httpResponse->setCode(201);
-        return [
-            "success" => true,
-            "link" => $this->link("this", $entity->{$primaryProperty->getName()}),
-            "body" => $entity->toArray(true)
-        ];
+
+        $this->resource->success = true;
+        $this->resource->link = $this->link("get", $entity->{$primaryProperty->getName()});
+        $this->resource->body = $entity->toArray(true);
     }
 
-    protected function update($id, array $data)
+    public function actionPut($id)
     {
         // @todo catch unsuccessfull convert
-        $entity = $this->repository->createEntity($data);
+        $entity = $this->repository->createEntity($this->data);
 
         if (!$entity->getReflection()->hasPrimaryProperty()) {
             $this->error("Can not update record if entity has no primary property defined!", Response::S405_METHOD_NOT_ALLOWED);
@@ -176,14 +147,12 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         $entity->{$primaryProperty->getName()} = $primaryProperty->convertValue($id);
         $this->repository->save($entity);
 
-        return [
-            "success" => true,
-            "link" => $this->link("this", $entity->{$primaryProperty->getName()}),
-            "body" => $entity->toArray(true)
-        ];
+        $this->resource->success = true;
+        $this->resource->link = $this->link("get", $entity->{$primaryProperty->getName()});
+        $this->resource->body = $entity->toArray(true);
     }
 
-    protected function destroy($id)
+    public function actionDelete($id)
     {
         $entity = $this->repository->createEntity();
         $primaryProperty = $entity->getReflection()->getPrimaryProperty();
@@ -193,9 +162,13 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
         $this->repository->delete($entity);
 
-        return [
-            "success" => true
-        ];
+        $this->resource->success = true;
+    }
+
+    public function beforeRender()
+    {
+        parent::beforeRender();
+        $this->sendJsonData($this->resource);
     }
 
     /**
@@ -208,23 +181,23 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         $this->sendResponse(new JsonResponse($data));
     }
 
-    /**
-     * Get request input json data
-     *
-     * @return array
-     */
-    public function getJsonData()
-    {
-        $data = Json::decode($this->input->getData(), Json::FORCE_ARRAY);
-        if (!$data) {
-            return [];
-        }
-        return $data;
-    }
-
     private function getPresenterName()
     {
        return explode(":", $this->getName())[1];
+    }
+
+    protected function getLimit()
+    {
+        $limit = (int) $this->getParameter("limit");
+        if ($limit > $this->maxLimit || $limit < 1) {
+            $limit = $this->maxLimit;
+        }
+        return $limit;
+    }
+
+    protected function getOffset()
+    {
+        return (int) $this->getParameter("offset");
     }
 
 }
