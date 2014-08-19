@@ -1,4 +1,4 @@
-/nbproject/
 /vendor/
+/tests/*/output/
+/tests/temp/
 composer.lock
-temp

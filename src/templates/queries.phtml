@@ -22,7 +22,7 @@ use UniMapper\NamingConvention as NC;
             <?php if ($query->data): ?>
             <tr>
                 <th>Data</th>
-                <td><?php echo $this->getClickable($query->data, true) ?></td>
+                <td><?php echo $this->_getClickable($query->data, true) ?></td>
             </tr>
             <?php endif ?>
         </table>
@@ -80,7 +80,7 @@ use UniMapper\NamingConvention as NC;
         <table>
             <tr>
                 <th>Values</th>
-                <td><?php echo $this->getClickable($query->getValues(), true) ?></td>
+                <td><?php echo $this->_getClickable($query->getValues(), true) ?></td>
             </tr>
         </table>
     </div>
@@ -93,7 +93,7 @@ use UniMapper\NamingConvention as NC;
             <?php include __DIR__ . '/queries/conditions.phtml' ?>
             <tr>
                 <th>Data</th>
-                <td><?php echo $this->getClickable($query->getValues(), true) ?></td>
+                <td><?php echo $this->_getClickable($query->getValues(), true) ?></td>
             </tr>
         </table>
     </div>

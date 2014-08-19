@@ -15,7 +15,7 @@ class Panel implements IBarPanel
         $this->repositories[] = $repository;
     }
 
-    private function getClickable($variable, $collapsed = false)
+    private function _getClickable($variable, $collapsed = false)
     {
         if (class_exists('Nette\Diagnostics\Dumper')) {
             return Dumper::toHtml($variable, [Dumper::COLLAPSE => $collapsed]);
@@ -36,14 +36,14 @@ class Panel implements IBarPanel
                 }
             }
         }
-        require __DIR__ . "/templates/Panel.tab.phtml";
+        include __DIR__ . "/templates/Panel.tab.phtml";
         return ob_get_clean();
     }
 
     public function getPanel()
     {
         ob_start();
-        require __DIR__ . "/templates/Panel.panel.phtml";
+        include __DIR__ . "/templates/Panel.panel.phtml";
         return ob_get_clean();
     }
 

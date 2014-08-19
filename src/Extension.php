@@ -67,10 +67,10 @@ class Extension extends CompilerExtension
 
             if (class_exists("Tracy\Debugger")) {
                 $panel->addSetup('Tracy\Debugger::getBar()->addPanel(?)', ['@self'])
-                      ->addSetup('Tracy\Debugger::getBlueScreen()->addPanel(?)', ['UniMapper\Nette\Extension::renderException']);
+                    ->addSetup('Tracy\Debugger::getBlueScreen()->addPanel(?)', ['UniMapper\Nette\Extension::renderException']);
             } else {
                 $panel->addSetup('Nette\Diagnostics\Debugger::$bar->addPanel(?)', ['@self'])
-                      ->addSetup('Nette\Diagnostics\Debugger::$blueScreen->addPanel(?)', ['UniMapper\Nette\Extension::renderException']);
+                    ->addSetup('Nette\Diagnostics\Debugger::$blueScreen->addPanel(?)', ['UniMapper\Nette\Extension::renderException']);
             }
         }
     }
@@ -97,7 +97,7 @@ class Extension extends CompilerExtension
         // Iterate over services
         foreach ($builder->getDefinitions() as $serviceName => $serviceDefinition) {
 
-            $class = $serviceDefinition->class !== NULL ? $serviceDefinition->class : $serviceDefinition->factory->entity;
+            $class = $serviceDefinition->class !== null ? $serviceDefinition->class : $serviceDefinition->factory->entity;
 
             // Repositories only
             if (class_exists($class) && is_subclass_of($class, "UniMapper\Repository")) {
@@ -214,7 +214,7 @@ class Extension extends CompilerExtension
                 "tab" => "Entity",
                 "panel" =>  $link . "\n" . $code
             ];
-	}
+        }
     }
 
 }

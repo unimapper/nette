@@ -181,9 +181,9 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         $this->sendResponse(new JsonResponse($data));
     }
 
-    private function getPresenterName()
+    protected function getPresenterName()
     {
-       return explode(":", $this->getName())[1];
+        return explode(":", $this->getName())[1];
     }
 
     protected function getLimit()

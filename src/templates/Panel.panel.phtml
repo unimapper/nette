@@ -33,17 +33,17 @@ use UniMapper\NamingConvention as NC;
                                 </a>
                                 <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
                                     <?php foreach ($query->getResult() as $entity) { ?>
-                                        <?php echo $this->getClickable($entity->toArray(true), true) ?>
+                                        <?php echo $this->_getClickable($entity->toArray(true), true) ?>
                                     <?php } ?>
                                 </div>
                             <?php endif ?>
                         <?php elseif ($query->getResult() instanceof \UniMapper\Entity): ?>
                             <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo NC::classToName(get_class($query->getResult()), NC::$entityMask) ?></a>
                             <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
-                                <?php echo $this->getClickable($query->getResult()->toArray(true), true) ?>
+                                <?php echo $this->_getClickable($query->getResult()->toArray(true), true) ?>
                             </div>
                         <?php else: ?>
-                            <?php echo $this->getClickable($query->getResult(), true) ?>
+                            <?php echo $this->_getClickable($query->getResult(), true) ?>
                         <?php endif ?>
                     </td>
                 </tr>
