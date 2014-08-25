@@ -41,6 +41,7 @@ unimapper:
     api:
         enabled: true
         module: "Api"
+    panel: false # (default = true)
 ```
 
 ## Api

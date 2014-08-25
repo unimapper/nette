@@ -26,6 +26,7 @@ class Extension extends CompilerExtension
 
     /** @var array $defaults Default configuration */
     public $defaults = [
+        "panel" => true,
         "cache" => true,
         "namingConvention" => [
             "repository" => null,
@@ -58,20 +59,10 @@ class Extension extends CompilerExtension
                 ->setClass("UniMapper\Nette\Api\Input");
         }
 
-        // Debug mode only
-        if ($builder->parameters["debugMode"]) {
-
-            // Create panel service
-            $panel = $builder->addDefinition($this->prefix("panel"))
+        // Create panel service in debug mode
+        if ($builder->parameters["debugMode"] && $config["panel"]) {
+            $builder->addDefinition($this->prefix("panel"))
                 ->setClass("UniMapper\Nette\Panel");
-
-            if (class_exists("Tracy\Debugger")) {
-                $panel->addSetup('Tracy\Debugger::getBar()->addPanel(?)', ['@self'])
-                    ->addSetup('Tracy\Debugger::getBlueScreen()->addPanel(?)', ['UniMapper\Nette\Extension::renderException']);
-            } else {
-                $panel->addSetup('Nette\Diagnostics\Debugger::$bar->addPanel(?)', ['@self'])
-                    ->addSetup('Nette\Diagnostics\Debugger::$blueScreen->addPanel(?)', ['UniMapper\Nette\Extension::renderException']);
-            }
         }
     }
 
@@ -80,8 +71,26 @@ class Extension extends CompilerExtension
         $builder = $this->getContainerBuilder();
         $config = $this->getConfig($this->defaults);
 
-        // Debug mode only
-        if ($builder->parameters["debugMode"]) {
+        // Back compatibility
+        if (class_exists("Tracy\Debugger")) {
+            $panelDef = 'Tracy\Debugger::getBar()->addPanel(?)';
+            $bluescreenDef = 'Tracy\Debugger::getBlueScreen()->addPanel(?)';
+        } else {
+            $panelDef = 'Nette\Diagnostics\Debugger::$bar->addPanel(?)';
+            $bluescreenDef = 'Nette\Diagnostics\Debugger::$blueScreen->addPanel(?)';
+        }
+
+        // Add bluescreen panel
+        $builder->getDefinition("application")->addSetup(
+            $bluescreenDef,
+            ['UniMapper\Nette\Extension::renderException']
+        );
+
+        // Setup panel in debug mode
+        if ($builder->parameters["debugMode"] && $config["panel"]) {
+
+            $builder->getDefinition($this->prefix("panel"))
+                ->addSetup($panelDef, ['@self']);
 
             // Register panel
             $builder->getDefinition("application")
@@ -120,7 +129,7 @@ class Extension extends CompilerExtension
                 }
 
                 // Register repository into the panel
-                if ($builder->parameters["debugMode"]) {
+                if ($builder->parameters["debugMode"] && $config["panel"]) {
                     $builder->getDefinition($this->prefix("panel"))->addSetup('registerRepository', [$builder->getDefinition($serviceName)]);
                 }
             }
