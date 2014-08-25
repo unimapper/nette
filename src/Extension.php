@@ -127,13 +127,7 @@ class Extension extends CompilerExtension
 
             // Adapters only
             if (class_exists($class) && is_subclass_of($class, "UniMapper\Adapter")) {
-
                 $adapters[] = $serviceName;
-
-                // Set adapter cache
-                if ($config["cache"]) {
-                    $builder->getDefinition($serviceName)->addSetup("setCache", [$builder->getDefinition($this->prefix("cache"))]);
-                }
             }
         }
 
