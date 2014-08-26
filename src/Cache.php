@@ -25,13 +25,9 @@ class Cache extends \UniMapper\Cache
         $this->cache->remove($key);
     }
 
-    public function save($key, $data, $file = null)
+    public function save($key, $data, array $files)
     {
-        $dependencies = array();
-        if ($file !== null) {
-            $dependencies[Caching\Cache::FILES] = $file;
-        }
-        $this->cache->save($key, $data, $dependencies);
+        $this->cache->save($key, $data, [Caching\Cache::FILES => $files]);
     }
 
 }
