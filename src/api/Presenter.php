@@ -17,7 +17,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     private $repositories;
 
     /** @var \Nette\Http\Response $httpResponse */
-    private $httpResponse;
+    protected $httpResponse;
 
     /** @var integer $maxLimit */
     protected $maxLimit = 10;
