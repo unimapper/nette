@@ -8,7 +8,8 @@ use Nette\Diagnostics\Dumper,
 class Panel implements IBarPanel
 {
 
-    protected $repositories = array();
+    private $repositories = [];
+    private $elapsed = [];
 
     public function registerRepository(\UniMapper\Repository $repository)
     {
@@ -25,18 +26,26 @@ class Panel implements IBarPanel
         return \Nette\Diagnostics\Helpers::clickableDump($variable, $collapsed);
     }
 
+    private function _getQueryLevel($time)
+    {
+        return round($time / max($this->elapsed) * 100);
+    }
+
     public function getTab()
     {
         ob_start();
-        $count = 0;
+
         foreach ($this->repositories as $repository) {
-            foreach ($repository->getLogger()->getQueries() as $query) {
+
+            $this->elapsed += array_map(function(\UniMapper\Query $query) {
                 if ($query->getResult() !== null) {
-                    $count++;
+                    return $query->getElapsed();
                 }
-            }
+            }, $repository->getLogger()->getQueries());
         }
+
         include __DIR__ . "/templates/Panel.tab.phtml";
+
         return ob_get_clean();
     }
 
