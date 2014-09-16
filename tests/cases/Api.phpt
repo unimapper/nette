@@ -4,6 +4,9 @@ use Tester\Assert;
 
 require __DIR__ . '/../bootstrap.php';
 
+/**
+ * @httpCode 400
+ */
 class ApiTest extends Tester\TestCase
 {
 
