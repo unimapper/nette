@@ -3,7 +3,10 @@ use UniMapper\NamingConvention as UNC;
 ?>
 
 <style type="text/css">
-    #nette-debug .unimapper-panel-progressbar {
+    #nette-debug .nette-panel .unimapper-panel-elapsed {
+         text-align: right;
+    }
+    #nette-debug .nette-panel .unimapper-panel-progressbar {
         text-align: center;
         height: 20px;
         overflow: hidden;
@@ -47,10 +50,10 @@ use UniMapper\NamingConvention as UNC;
                 <?php $index = $repositoryIndex . "-" . $queryIndex ?>
                 <?php if ($query->getResult() !== null): ?>
                 <tr>
-                    <td><?php echo round($query->getElapsed() * 1000, 2) ?> ms</td>
+                    <td class="unimapper-panel-elapsed"><?php echo round($query->getElapsed() * 1000, 2) ?> ms</td>
                     <td>
                         <?php
-                            $queryLevel = $this->_getQueryLevel($query->getElapsed());
+                            $queryLevel = $this->_getQueryLevel($elapsed, $query->getElapsed());
                             if ($queryLevel > 80) {
                                 $demands = "high";
                             } elseif ($queryLevel <= 80 && $queryLevel >= 40) {

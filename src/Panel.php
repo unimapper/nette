@@ -9,7 +9,6 @@ class Panel implements IBarPanel
 {
 
     private $repositories = [];
-    private $elapsed = [];
 
     public function registerRepository(\UniMapper\Repository $repository)
     {
@@ -26,31 +25,38 @@ class Panel implements IBarPanel
         return \Nette\Diagnostics\Helpers::clickableDump($variable, $collapsed);
     }
 
-    private function _getQueryLevel($time)
+    private function _getQueryLevel(array $elapsed, $time)
     {
-        return round($time / max($this->elapsed) * 100);
+        return round($time / max($elapsed) * 100);
+    }
+
+    private function _getElapsed()
+    {
+        $elapsed = [];
+        foreach ($this->repositories as $repository) {
+
+            foreach ($repository->getLogger()->getQueries() as $query) {
+                if ($query->getResult() !== null) {
+                    $elapsed[] = $query->getElapsed();
+                }
+            }
+        }
+        return $elapsed;
     }
 
     public function getTab()
     {
+        $elapsed = $this->_getElapsed();
+
         ob_start();
-
-        foreach ($this->repositories as $repository) {
-
-            $this->elapsed += array_map(function(\UniMapper\Query $query) {
-                if ($query->getResult() !== null) {
-                    return $query->getElapsed();
-                }
-            }, $repository->getLogger()->getQueries());
-        }
-
         include __DIR__ . "/templates/Panel.tab.phtml";
-
         return ob_get_clean();
     }
 
     public function getPanel()
     {
+        $elapsed = $this->_getElapsed();
+
         ob_start();
         include __DIR__ . "/templates/Panel.panel.phtml";
         return ob_get_clean();
