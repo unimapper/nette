@@ -1,6 +1,6 @@
-<?php foreach ($query->getOrderBy() as $orderBy) { ?>
+<?php foreach ($query->getOrderBy() as $propertyName => $direction) { ?>
     <tr>
         <th>order by</th>
-        <td><?php echo $orderBy[0] ?> <?php echo $orderBy[1] ?></td>
+        <td><?php if ($direction === "asc"): ?>&#x25B2;<?php else: ?>&#x25BC;<?php endif ?>&nbsp;<?php echo $propertyName ?></td>
     </tr>
 <?php } ?>
