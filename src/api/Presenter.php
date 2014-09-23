@@ -79,7 +79,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         $this->data = Json::decode($this->input->getData(), Json::FORCE_ARRAY);
     }
 
-    public function actionGet($id = null)
+    public function actionGet($id = null, array $associate = [])
     {
         if ($id) {
 
@@ -89,7 +89,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
                 ->getPrimaryProperty()
                 ->convertValue($id);
 
-            $entity = $this->repository->findOne($primaryValue);
+            $entity = $this->repository->findOne($primaryValue, $associate);
 
             if (!$entity) {
                 $this->error("Resource not found!", Response::S404_NOT_FOUND);
@@ -97,7 +97,14 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
             $this->resource->body = $entity;
         } else {
-            $this->resource->body = $this->repository->find([], [], $this->getLimit(), $this->getOffset());
+
+            $this->resource->body = $this->repository->find(
+                [],
+                [],
+                $this->getLimit(),
+                $this->getOffset(),
+                $associate
+            );
         }
     }
 
