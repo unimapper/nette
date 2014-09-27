@@ -61,6 +61,10 @@ class Extension extends CompilerExtension
 
         // Create panel service in debug mode
         if ($builder->parameters["debugMode"] && $config["panel"]) {
+
+            $builder->addDefinition($this->prefix("umlGenerator"))
+                ->setClass("UniMapper\PlantUml\Generator");
+
             $builder->addDefinition($this->prefix("panel"))
                 ->setClass("UniMapper\Nette\Panel");
         }

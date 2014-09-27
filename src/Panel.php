@@ -8,11 +8,29 @@ use Nette\Diagnostics\Dumper,
 class Panel implements IBarPanel
 {
 
+    /** @var array */
     private $repositories = [];
+
+    /** @var \UniMapper\PlantUml\Genarator */
+    private $umlGenerator;
+
+    public function __construct(\UniMapper\PlantUml\Generator $umlGenerator = null)
+    {
+        $this->umlGenerator = $umlGenerator;
+    }
 
     public function registerRepository(\UniMapper\Repository $repository)
     {
         $this->repositories[] = $repository;
+
+        if ($this->umlGenerator) {
+            $this->umlGenerator->add($repository->createEntity()->getReflection());
+        }
+    }
+
+    private function _getUmlUrl()
+    {
+
     }
 
     private function _getClickable($variable, $collapsed = false)

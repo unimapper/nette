@@ -101,4 +101,7 @@ use UniMapper\NamingConvention as UNC;
         <?php endforeach ?>
         </tbody>
     </table>
+    <?php if ($this->umlGenerator): ?>
+        <a href="http://www.plantuml.com/plantuml/img/<?php echo $this->umlGenerator->getUrlCode($this->umlGenerator->generate()) ?>" target="_blank">Show schema</a>
+    <?php endif ?>
 </div>
