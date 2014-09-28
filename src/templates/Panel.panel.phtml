@@ -36,72 +36,74 @@ use UniMapper\NamingConvention as UNC;
 
 <h1>UniMapper queries</h1>
 <div class="nette-inner">
-    <table class="unimapper-nette-queries">
-        <thead>
-            <th>Elapsed time</th>
-            <th>Demands</th>
-            <th>Repository</th>
-            <th>Query</th>
-            <th>Result</th>
-        </thead>
-        <tbody>
-        <?php foreach ($this->repositories as $repositoryIndex => $repository): ?>
-            <?php foreach ($repository->getLogger()->getQueries() as $queryIndex => $query): ?>
-                <?php $index = $repositoryIndex . "-" . $queryIndex ?>
-                <?php if ($query->getResult() !== null): ?>
-                <tr>
-                    <td class="unimapper-panel-elapsed"><?php echo round($query->getElapsed() * 1000, 2) ?> ms</td>
-                    <td>
-                        <?php
-                            $queryLevel = $this->_getQueryLevel($elapsed, $query->getElapsed());
-                            if ($queryLevel > 80) {
-                                $demands = "high";
-                            } elseif ($queryLevel <= 80 && $queryLevel >= 40) {
-                                $demands = "medium";
-                            } else {
-                                $demands = "low";
-                            }
-                        ?>
-                        <div class="unimapper-panel-progressbar">
-                           <div class="demands-level-<?php echo $demands ?>" style="width: <?php echo $queryLevel  ?>%"></div>
-                        </div>
-                    </td>
-                    <td><?php echo $repository->getName() ?></td>
-                    <td>
-                        <?php include __DIR__ . '/queries.phtml' ?>
-                    </td>
-                    <td>
-                        <!-- result -->
-                        <?php if ($query->getResult() instanceof \UniMapper\EntityCollection): ?>
-                            <?php if (count($query->getResult()) === 0): ?>
-                                [0] <?php echo UNC::classToName($query->getResult()->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
-                            <?php else: ?>
-                                <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>">
-                                    [<?php echo count($query->getResult()) ?>]
-                                    <?php echo UNC::classToName($query->getResult()->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
-                                </a>
-                                <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
-                                    <?php foreach ($query->getResult() as $entity) { ?>
-                                        <?php echo $this->_getClickable($entity->toArray(true), true) ?>
-                                    <?php } ?>
-                                </div>
-                            <?php endif ?>
-                        <?php elseif ($query->getResult() instanceof \UniMapper\Entity): ?>
-                            <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo UNC::classToName(get_class($query->getResult()), UNC::$entityMask) ?></a>
-                            <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
-                                <?php echo $this->_getClickable($query->getResult()->toArray(true), true) ?>
+    <?php if (count($elapsed) > 0): ?>
+        <table class="unimapper-nette-queries">
+            <thead>
+                <th>Elapsed time</th>
+                <th>Demands</th>
+                <th>Repository</th>
+                <th>Query</th>
+                <th>Result</th>
+            </thead>
+            <tbody>
+            <?php foreach ($this->repositories as $repositoryIndex => $repository): ?>
+                <?php foreach ($repository->getLogger()->getQueries() as $queryIndex => $query): ?>
+                    <?php $index = $repositoryIndex . "-" . $queryIndex ?>
+                    <?php if ($query->getResult() !== null): ?>
+                    <tr>
+                        <td class="unimapper-panel-elapsed"><?php echo round($query->getElapsed() * 1000, 2) ?> ms</td>
+                        <td>
+                            <?php
+                                $queryLevel = $this->_getQueryLevel($elapsed, $query->getElapsed());
+                                if ($queryLevel > 80) {
+                                    $demands = "high";
+                                } elseif ($queryLevel <= 80 && $queryLevel >= 40) {
+                                    $demands = "medium";
+                                } else {
+                                    $demands = "low";
+                                }
+                            ?>
+                            <div class="unimapper-panel-progressbar">
+                               <div class="demands-level-<?php echo $demands ?>" style="width: <?php echo $queryLevel  ?>%"></div>
                             </div>
-                        <?php else: ?>
-                            <?php echo $this->_getClickable($query->getResult(), true) ?>
-                        <?php endif ?>
-                    </td>
-                </tr>
-                <?php endif ?>
+                        </td>
+                        <td><?php echo $repository->getName() ?></td>
+                        <td>
+                            <?php include __DIR__ . '/queries.phtml' ?>
+                        </td>
+                        <td>
+                            <!-- result -->
+                            <?php if ($query->getResult() instanceof \UniMapper\EntityCollection): ?>
+                                <?php if (count($query->getResult()) === 0): ?>
+                                    [0] <?php echo UNC::classToName($query->getResult()->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
+                                <?php else: ?>
+                                    <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>">
+                                        [<?php echo count($query->getResult()) ?>]
+                                        <?php echo UNC::classToName($query->getResult()->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
+                                    </a>
+                                    <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
+                                        <?php foreach ($query->getResult() as $entity) { ?>
+                                            <?php echo $this->_getClickable($entity->toArray(true), true) ?>
+                                        <?php } ?>
+                                    </div>
+                                <?php endif ?>
+                            <?php elseif ($query->getResult() instanceof \UniMapper\Entity): ?>
+                                <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo UNC::classToName(get_class($query->getResult()), UNC::$entityMask) ?></a>
+                                <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
+                                    <?php echo $this->_getClickable($query->getResult()->toArray(true), true) ?>
+                                </div>
+                            <?php else: ?>
+                                <?php echo $this->_getClickable($query->getResult(), true) ?>
+                            <?php endif ?>
+                        </td>
+                    </tr>
+                    <?php endif ?>
+                <?php endforeach ?>
             <?php endforeach ?>
-        <?php endforeach ?>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    <?php endif ?>
     <?php if ($this->repositories): ?>
-        <a href="http://www.plantuml.com/plantuml/img/<?php echo $this->umlGenerator->getUrlCode($this->umlGenerator->generate()) ?>" target="_blank">Show schema</a>
+        <a href="http://www.plantuml.com/plantuml/img/<?php echo $this->umlGenerator->getUrlCode($this->umlGenerator->generate()) ?>" target="_blank">UML schema</a>
     <?php endif ?>
 </div>
