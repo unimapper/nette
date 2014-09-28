@@ -11,13 +11,13 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "bauer01/unimapper-plantuml": "@dev"
     },
     "require-dev": {
         "nette/tester": "~1.2.0",
         "mockery/mockery": "~0.9.0",
         "bauer01/unimapper": "@dev",
-        "bauer01/unimapper-plantuml": "@dev",
         "nette/nette": "~2.0",
         "squizlabs/php_codesniffer": "~1.5.0"
     },
