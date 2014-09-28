@@ -14,23 +14,15 @@ class Panel implements IBarPanel
     /** @var \UniMapper\PlantUml\Genarator */
     private $umlGenerator;
 
-    public function __construct(\UniMapper\PlantUml\Generator $umlGenerator = null)
+    public function __construct()
     {
-        $this->umlGenerator = $umlGenerator;
+        $this->umlGenerator = new \UniMapper\PlantUml\Generator;
     }
 
     public function registerRepository(\UniMapper\Repository $repository)
     {
         $this->repositories[] = $repository;
-
-        if ($this->umlGenerator) {
-            $this->umlGenerator->add($repository->createEntity()->getReflection());
-        }
-    }
-
-    private function _getUmlUrl()
-    {
-
+        $this->umlGenerator->add($repository->createEntity()->getReflection());
     }
 
     private function _getClickable($variable, $collapsed = false)
