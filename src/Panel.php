@@ -14,8 +14,12 @@ class Panel implements IBarPanel
     /** @var \UniMapper\PlantUml\Genarator */
     private $umlGenerator;
 
-    public function __construct()
+    /** @var array */
+    private $config;
+
+    public function __construct(array $config)
     {
+        $this->config = $config;
         $this->umlGenerator = new \UniMapper\PlantUml\Generator;
     }
 

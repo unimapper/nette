@@ -119,11 +119,17 @@ use UniMapper\NamingConvention as UNC;
     <tbody>
         <tr>
             <td>API</td>
-            <td>Enabled</td>
+            <td><?php echo $this->config["api"]["enabled"] ? "<strong>Enabled</strong>" : "Disabled" ?></td>
         </tr>
+        <?php if ($this->config["api"]["enabled"]): ?>
+        <tr>
+            <td>API Module</td>
+            <td><?php echo $this->config["api"]["module"] ?>:</td>
+        </tr>
+        <?php endif ?>
         <tr>
             <td>Cache</td>
-            <td>Enabled</td>
+            <td><?php echo $this->config["cache"] ? "<strong>Enabled</strong>" : "Disabled" ?></strong></td>
         </tr>
         <tr>
             <td>Entity namespace</td>

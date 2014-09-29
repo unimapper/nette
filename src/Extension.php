@@ -63,7 +63,7 @@ class Extension extends CompilerExtension
         if ($builder->parameters["debugMode"] && $config["panel"]) {
 
             $builder->addDefinition($this->prefix("panel"))
-                ->setClass("UniMapper\Nette\Panel");
+                ->setClass("UniMapper\Nette\Panel", [$config]);
         }
     }
 
