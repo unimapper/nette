@@ -7,6 +7,10 @@ use UniMapper\NamingConvention as UNC;
     #nette-debug .nette-panel table {
         margin-bottom: 10px;
     }
+    #tracy-debug .tracy-panel table td,
+    #nette-debug .nette-panel table td {
+        list-style-type: none;
+    }
     #tracy-debug .tracy-panel .unimapper-panel-elapsed,
     #nette-debug .nette-panel .unimapper-panel-elapsed {
          text-align: right;
@@ -139,6 +143,18 @@ use UniMapper\NamingConvention as UNC;
             <td>Repository namespace</td>
             <td><?php echo UNC::$repositoryMask ?></td>
         </tr>
+        <?php if ($this->config["customQueries"]): ?>
+        <tr>
+            <td>Custom queries</td>
+            <td>
+                <ul>
+                    <?php foreach ($this->config["customQueries"] as $customQuery): ?>
+                        <li><?php echo $customQuery ?></li>
+                    <?php endforeach ?>
+                </ul>
+            </td>
+        </tr>
+        <?php endif ?>
     </tbody>
 </table>
 <?php if ($this->repositories): ?>
