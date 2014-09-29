@@ -8,6 +8,8 @@ use Nette\Diagnostics\Dumper,
 class Panel implements IBarPanel
 {
 
+    const UML_CACHE_KEY = "uml.schema";
+
     /** @var array */
     private $repositories = [];
 
@@ -17,9 +19,13 @@ class Panel implements IBarPanel
     /** @var array */
     private $config;
 
-    public function __construct(array $config)
+    /** @var Cache */
+    private $cache;
+
+    public function __construct(array $config, Cache $cache = null)
     {
         $this->config = $config;
+        $this->cache = $cache;
         $this->umlGenerator = new \UniMapper\PlantUml\Generator;
     }
 
@@ -69,11 +75,29 @@ class Panel implements IBarPanel
 
     public function getPanel()
     {
+        if ($this->cache) {
+
+            $umlUrl = $this->cache->load(self::UML_CACHE_KEY);
+            if (!$umlUrl) {
+
+                $umlUrl = $this->_generateUmlUrl();
+                $this->cache->save(self::UML_CACHE_KEY, $umlUrl, []);
+            }
+        } else {
+            $umlUrl = $this->_generateUmlUrl();
+        }
+
         $elapsed = $this->_getElapsed();
 
         ob_start();
         include __DIR__ . "/templates/Panel.panel.phtml";
         return ob_get_clean();
+    }
+
+    private function _generateUmlUrl()
+    {
+        return "http://www.plantuml.com/plantuml/img/"
+            . $this->umlGenerator->getUrlCode($this->umlGenerator->generate());
     }
 
 }

@@ -142,5 +142,5 @@ use UniMapper\NamingConvention as UNC;
     </tbody>
 </table>
 <?php if ($this->repositories): ?>
-    <a href="http://www.plantuml.com/plantuml/img/<?php echo $this->umlGenerator->getUrlCode($this->umlGenerator->generate()) ?>" target="_blank">UML schema</a>
+    <a href="<?php echo $umlUrl ?>" target="_blank">UML schema</a>
 <?php endif ?>
