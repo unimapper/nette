@@ -2,13 +2,24 @@
 
 namespace UniMapper\Nette;
 
-use Nette\Caching;
+use Nette\Caching,
+    UniMapper\Cache\ICache;
 
-class Cache extends \UniMapper\Cache
+class Cache implements ICache
 {
 
     /** @var \Nette\Caching\Cache */
-    protected $cache;
+    private $cache;
+
+    private $options = [
+        self::CALLBACKS => Caching\Cache::CALLBACKS,
+        self::EXPIRE => Caching\Cache::EXPIRE,
+        self::FILES => Caching\Cache::FILES,
+        self::ITEMS => Caching\Cache::ITEMS,
+        self::PRIORITY => Caching\Cache::PRIORITY,
+        self::SLIDING => Caching\Cache::SLIDING,
+        self::TAGS => Caching\Cache::TAGS
+    ];
 
     public function __construct(Caching\IStorage $storage)
     {
@@ -25,9 +36,17 @@ class Cache extends \UniMapper\Cache
         $this->cache->remove($key);
     }
 
-    public function save($key, $data, array $files)
+    public function save($key, $data, array $options = [])
     {
-        $this->cache->save($key, $data, [Caching\Cache::FILES => $files]);
+        $netteOptions = [];
+        foreach ($options as $type => $option) {
+            if (!isset($this->options[$type])) {
+                throw new \Exception("Unsupported cache option " . $type . "!");
+            }
+            $netteOptions[$this->options[$type]] = $option;
+        }
+
+        $this->cache->save($key, $data, $netteOptions);
     }
 
 }
