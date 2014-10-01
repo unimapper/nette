@@ -9,7 +9,7 @@ class Cache implements ICache
 {
 
     /** @var \Nette\Caching\Cache */
-    private $cache;
+    private $netteCache;
 
     private $options = [
         self::CALLBACKS => Caching\Cache::CALLBACKS,
@@ -23,17 +23,12 @@ class Cache implements ICache
 
     public function __construct(Caching\IStorage $storage)
     {
-        $this->cache = new Caching\Cache($storage, "UniMapper.Cache");
+        $this->netteCache = new Caching\Cache($storage, "UniMapper.Cache");
     }
 
     public function load($key)
     {
-        return $this->cache->load($key);
-    }
-
-    public function remove($key)
-    {
-        $this->cache->remove($key);
+        return $this->netteCache->load($key);
     }
 
     public function save($key, $data, array $options = [])
@@ -46,7 +41,12 @@ class Cache implements ICache
             $netteOptions[$this->options[$type]] = $option;
         }
 
-        $this->cache->save($key, $data, $netteOptions);
+        $this->netteCache->save($key, $data, $netteOptions);
+    }
+
+    public function getNetteCache()
+    {
+        return $this->netteCache;
     }
 
 }
