@@ -56,8 +56,8 @@ class Panel implements IBarPanel
         foreach ($this->repositories as $repository) {
 
             foreach ($repository->getLogger()->getQueries() as $query) {
-                if ($query->getResult() !== null) {
-                    $elapsed[] = $query->getElapsed();
+                if ($query->result !== null) {
+                    $elapsed[] = $query->elapsed;
                 }
             }
         }

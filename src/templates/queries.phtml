@@ -9,7 +9,7 @@ use UniMapper\NamingConvention as NC;
         <table>
             <tr>
                 <th>Entity</th>
-                <td><?php echo NC::classToName($query->getEntityReflection()->getClassName(), NC::$entityMask) ?></td>
+                <td><?php echo NC::classToName($query->entityReflection->getClassName(), NC::$entityMask) ?></td>
             </tr>
             <tr>
                 <th>Method</th>
@@ -80,7 +80,7 @@ use UniMapper\NamingConvention as NC;
         <table>
             <tr>
                 <th>Values</th>
-                <td><?php echo $this->_getClickable($query->getValues(), true) ?></td>
+                <td><?php echo $this->_getClickable($query->entity->getData(), true) ?></td>
             </tr>
         </table>
     </div>
@@ -93,7 +93,7 @@ use UniMapper\NamingConvention as NC;
             <?php include __DIR__ . '/queries/conditions.phtml' ?>
             <tr>
                 <th>Data</th>
-                <td><?php echo $this->_getClickable($query->getValues(), true) ?></td>
+                <td><?php echo $this->_getClickable($query->entity->getData(), true) ?></td>
             </tr>
         </table>
     </div>

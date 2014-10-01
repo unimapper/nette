@@ -62,12 +62,12 @@ use UniMapper\NamingConvention as UNC;
         <?php foreach ($this->repositories as $repositoryIndex => $repository): ?>
             <?php foreach ($repository->getLogger()->getQueries() as $queryIndex => $query): ?>
                 <?php $index = $repositoryIndex . "-" . $queryIndex ?>
-                <?php if ($query->getResult() !== null): ?>
+                <?php if ($query->result !== null): ?>
                 <tr>
-                    <td class="unimapper-panel-elapsed"><?php echo round($query->getElapsed() * 1000, 2) ?> ms</td>
+                    <td class="unimapper-panel-elapsed"><?php echo round($query->elapsed * 1000, 2) ?> ms</td>
                     <td>
                         <?php
-                            $queryLevel = $this->_getQueryLevel($elapsed, $query->getElapsed());
+                            $queryLevel = $this->_getQueryLevel($elapsed, $query->elapsed);
                             if ($queryLevel > 80) {
                                 $demands = "high";
                             } elseif ($queryLevel <= 80 && $queryLevel >= 40) {
@@ -86,27 +86,27 @@ use UniMapper\NamingConvention as UNC;
                     </td>
                     <td>
                         <!-- result -->
-                        <?php if ($query->getResult() instanceof \UniMapper\EntityCollection): ?>
-                            <?php if (count($query->getResult()) === 0): ?>
-                                [0] <?php echo UNC::classToName($query->getResult()->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
+                        <?php if ($query->result instanceof \UniMapper\EntityCollection): ?>
+                            <?php if (count($query->result) === 0): ?>
+                                [0] <?php echo UNC::classToName($query->result->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
                             <?php else: ?>
                                 <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>">
-                                    [<?php echo count($query->getResult()) ?>]
-                                    <?php echo UNC::classToName($query->getResult()->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
+                                    [<?php echo count($query->result) ?>]
+                                    <?php echo UNC::classToName($query->result->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
                                 </a>
                                 <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
-                                    <?php foreach ($query->getResult() as $entity) { ?>
+                                    <?php foreach ($query->result as $entity) { ?>
                                         <?php echo $this->_getClickable($entity->toArray(true), true) ?>
                                     <?php } ?>
                                 </div>
                             <?php endif ?>
-                        <?php elseif ($query->getResult() instanceof \UniMapper\Entity): ?>
-                            <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo UNC::classToName(get_class($query->getResult()), UNC::$entityMask) ?></a>
+                        <?php elseif ($query->result instanceof \UniMapper\Entity): ?>
+                            <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo UNC::classToName(get_class($query->result), UNC::$entityMask) ?></a>
                             <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
-                                <?php echo $this->_getClickable($query->getResult()->toArray(true), true) ?>
+                                <?php echo $this->_getClickable($query->result->toArray(true), true) ?>
                             </div>
                         <?php else: ?>
-                            <?php echo $this->_getClickable($query->getResult(), true) ?>
+                            <?php echo $this->_getClickable($query->result, true) ?>
                         <?php endif ?>
                     </td>
                 </tr>

@@ -1,8 +1,8 @@
-<?php if ($query->getLimit() !== 0): ?>
+<?php if ($query->limit): ?>
     <tr>
         <th>Limit</th>
         <td>
-            <?php echo $query->getLimit() ?>
+            <?php echo $query->limit ?>
         </td>
     </tr>
 <?php endif ?>
