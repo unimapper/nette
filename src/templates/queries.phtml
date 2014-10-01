@@ -31,6 +31,9 @@ use UniMapper\NamingConvention as NC;
     <a href="#unimapper-panel-query-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
         <strong>find</strong>
     </a>
+    <?php if ($query->cached): ?>
+        <span class="unimapper-panel-label" style="background-color: #428bca; color: #fff;">Cached</span>
+    <?php endif ?>
     <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
         <table>
             <?php include __DIR__ . '/queries/selection.phtml' ?>
@@ -38,6 +41,14 @@ use UniMapper\NamingConvention as NC;
             <?php include __DIR__ . '/queries/limit.phtml' ?>
             <?php include __DIR__ . '/queries/offset.phtml' ?>
             <?php include __DIR__ . '/queries/orderBy.phtml' ?>
+            <?php if ($query->cachedOptions): ?>
+            <tr>
+                <th>Cache options</th>
+                <td>
+                    <?php echo $this->_getClickable($query->cachedOptions, true) ?>
+                </td>
+            </tr>
+            <?php endif ?>
         </table>
     </div>
 <?php elseif ($query instanceof \UniMapper\Query\FindOne): ?>

@@ -11,6 +11,18 @@ use UniMapper\NamingConvention as UNC;
     #nette-debug .nette-panel table td {
         list-style-type: none;
     }
+    #tracy-debug .tracy-panel .unimapper-panel-label,
+    #nette-debug .nette-panel .unimapper-panel-label {
+        border-radius: 0.25em;
+        text-align: center;
+        vertical-align: baseline;
+        white-space: nowrap;
+        padding: 0.2em 0.6em 0.3em;
+        display: inline;
+        font-size: 75%;
+        font-weight: 700;
+        line-height: 1;
+    }
     #tracy-debug .tracy-panel .unimapper-panel-elapsed,
     #nette-debug .nette-panel .unimapper-panel-elapsed {
          text-align: right;
@@ -64,7 +76,9 @@ use UniMapper\NamingConvention as UNC;
                 <?php $index = $repositoryIndex . "-" . $queryIndex ?>
                 <?php if ($query->result !== null): ?>
                 <tr>
-                    <td class="unimapper-panel-elapsed"><?php echo round($query->elapsed * 1000, 2) ?> ms</td>
+                    <td class="unimapper-panel-elapsed">
+                        <?php echo round($query->elapsed * 1000, 2) ?> ms
+                    </td>
                     <td>
                         <?php
                             $queryLevel = $this->_getQueryLevel($elapsed, $query->elapsed);
