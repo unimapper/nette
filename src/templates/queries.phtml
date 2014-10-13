@@ -2,31 +2,7 @@
 use UniMapper\NamingConvention as NC;
 ?>
 <?php if ($query instanceof \UniMapper\Query\Custom): ?>
-    <a href="#unimapper-panel-query-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
-        <strong>custom</strong>
-    </a>
-    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
-        <table>
-            <tr>
-                <th>Entity</th>
-                <td><?php echo NC::classToName($query->entityReflection->getClassName(), NC::$entityMask) ?></td>
-            </tr>
-            <tr>
-                <th>Method</th>
-                <td><?php echo $query->method ?></td>
-            </tr>
-            <tr>
-                <th>Query</th>
-                <td><?php echo $query->query ?></td>
-            </tr>
-            <?php if ($query->data): ?>
-            <tr>
-                <th>Data</th>
-                <td><?php echo $this->_getClickable($query->data, true) ?></td>
-            </tr>
-            <?php endif ?>
-        </table>
-    </div>
+    <strong><?php $query->getName() ?></strong>
 <?php elseif ($query instanceof \UniMapper\Query\Find): ?>
     <a href="#unimapper-panel-query-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
         <strong>find</strong>

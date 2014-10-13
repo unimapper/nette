@@ -58,9 +58,25 @@ use UniMapper\NamingConvention as UNC;
         background-color: #428bca;
         color: #fff;
     }
+    #tracy-debug .unimapper-panel-badge,
+    #nette-debug .unimapper-panel-badge {
+        background-color: #777;
+        border-radius: 10px;
+        color: #fff;
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        min-width: 10px;
+        padding: 3px 7px;
+        text-align: center;
+        vertical-align: baseline;
+        white-space: nowrap;
+    }
 </style>
 
 <h1>UniMapper</h1>
+<div class="nette-inner tracy-inner">
 <?php if (count($elapsed) > 0): ?>
     <table>
         <thead>
@@ -68,13 +84,14 @@ use UniMapper\NamingConvention as UNC;
             <th>Demands</th>
             <th>Repository</th>
             <th>Query</th>
+            <th>Adapter queries</th>
             <th>Result</th>
         </thead>
         <tbody>
         <?php foreach ($this->repositories as $repositoryIndex => $repository): ?>
             <?php foreach ($repository->getLogger()->getQueries() as $queryIndex => $query): ?>
                 <?php $index = $repositoryIndex . "-" . $queryIndex ?>
-                <?php if ($query->result !== null): ?>
+                <?php if ($query->executed): ?>
                 <tr>
                     <td class="unimapper-panel-elapsed">
                         <?php echo round($query->elapsed * 1000, 2) ?> ms
@@ -97,6 +114,15 @@ use UniMapper\NamingConvention as UNC;
                     <td><?php echo $repository->getName() ?></td>
                     <td>
                         <?php include __DIR__ . '/queries.phtml' ?>
+                    </td>
+                    <td>
+                        <span class="unimapper-panel-badge"><?php echo count($query->adapterQueries) ?></span>
+                        <a href="#unimapper-panel-adapter-queries-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-adapter-queries-<?php echo $index ?>"></a>
+                        <div id="unimapper-panel-adapter-queries-<?php echo $index ?>" class="nette-collapsed">
+                            <?php foreach ($query->adapterQueries as $adapterQuery): ?>
+                                <pre class="nette-dump tracy-dump"><span class="nette-dump-string tracy-dump-string"><?php echo $adapterQuery ?></span></pre>
+                            <?php endforeach ?>
+                        </div>
                     </td>
                     <td>
                         <!-- result -->
@@ -174,3 +200,4 @@ use UniMapper\NamingConvention as UNC;
 <?php if ($this->repositories): ?>
     <a href="<?php echo $umlUrl ?>" target="_blank">UML schema</a>
 <?php endif ?>
+</div>
