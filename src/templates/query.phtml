@@ -1,0 +1,81 @@
+<?php if ($query instanceof \UniMapper\Query\Custom): ?>
+    <strong><?php $query->getName() ?></strong>
+<?php elseif ($query instanceof \UniMapper\Query\Find): ?>
+    <a href="#unimapper-panel-query-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
+        <strong>find</strong>
+    </a>
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="tracy-collapsed nette-collapsed">
+        <table>
+            <?php include __DIR__ . '/queries/selection.phtml' ?>
+            <?php include __DIR__ . '/queries/conditions.phtml' ?>
+            <?php include __DIR__ . '/queries/limit.phtml' ?>
+            <?php include __DIR__ . '/queries/offset.phtml' ?>
+            <?php include __DIR__ . '/queries/orderBy.phtml' ?>
+            <?php if ($query->cachedOptions): ?>
+            <tr>
+                <th>Cache options</th>
+                <td>
+                    <?php echo $this->_getClickable($query->cachedOptions, true) ?>
+                </td>
+            </tr>
+            <?php endif ?>
+        </table>
+    </div>
+<?php elseif ($query instanceof \UniMapper\Query\FindOne): ?>
+    <a href="#unimapper-panel-query-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
+        <strong>findOne</strong>
+    </a>
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="tracy-collapsed nette-collapsed">
+        <table>
+            <tr>
+                <th>Primary value</th>
+                <td>
+                    <?php echo $query->primaryValue ?>
+                </td>
+            </tr>
+        </table>
+    </div>
+<?php elseif ($query instanceof \UniMapper\Query\Count): ?>
+    <a href="#unimapper-panel-query-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
+        <strong>count</strong>
+    </a>
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="tracy-collapsed nette-collapsed">
+        <table>
+            <?php include __DIR__ . '/queries/conditions.phtml' ?>
+        </table>
+    </div>
+<?php elseif ($query instanceof \UniMapper\Query\Delete): ?>
+    <a href="#unimapper-panel-query-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>-">
+        <strong>delete</strong>
+    </a>
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="tracy-collapsed nette-collapsed">
+        <table>
+            <?php include __DIR__ . '/queries/conditions.phtml' ?>
+        </table>
+    </div>
+<?php elseif ($query instanceof \UniMapper\Query\Insert): ?>
+    <a href="#unimapper-panel-query-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
+        <strong>insert</strong>
+    </a>
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="tracy-collapsed nette-collapsed">
+        <table>
+            <tr>
+                <th>Values</th>
+                <td><?php echo $this->_getClickable($query->entity->getData(), true) ?></td>
+            </tr>
+        </table>
+    </div>
+<?php elseif ($query instanceof \UniMapper\Query\Update): ?>
+    <a href="#unimapper-panel-query-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
+        <strong>update</strong>
+    </a>
+    <div id="unimapper-panel-query-<?php echo $index ?>" class="tracy-collapsed nette-collapsed">
+        <table>
+            <?php include __DIR__ . '/queries/conditions.phtml' ?>
+            <tr>
+                <th>Data</th>
+                <td><?php echo $this->_getClickable($query->entity->getData(), true) ?></td>
+            </tr>
+        </table>
+    </div>
+<?php endif ?>

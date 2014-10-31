@@ -1,87 +1,88 @@
 <?php
-use UniMapper\NamingConvention as NC;
-?>
-<?php if ($query instanceof \UniMapper\Query\Custom): ?>
-    <strong><?php $query->getName() ?></strong>
-<?php elseif ($query instanceof \UniMapper\Query\Find): ?>
-    <a href="#unimapper-panel-query-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
-        <strong>find</strong>
-    </a>
-    <?php if ($query->cached): ?>
-        <span class="unimapper-panel-label" style="background-color: #428bca; color: #fff;">Cached</span>
-    <?php endif ?>
-    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
-        <table>
-            <?php include __DIR__ . '/queries/selection.phtml' ?>
-            <?php include __DIR__ . '/queries/conditions.phtml' ?>
-            <?php include __DIR__ . '/queries/limit.phtml' ?>
-            <?php include __DIR__ . '/queries/offset.phtml' ?>
-            <?php include __DIR__ . '/queries/orderBy.phtml' ?>
-            <?php if ($query->cachedOptions): ?>
-            <tr>
-                <th>Cache options</th>
-                <td>
-                    <?php echo $this->_getClickable($query->cachedOptions, true) ?>
-                </td>
-            </tr>
-            <?php endif ?>
-        </table>
-    </div>
-<?php elseif ($query instanceof \UniMapper\Query\FindOne): ?>
-    <a href="#unimapper-panel-query-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
-        <strong>findOne</strong>
-    </a>
-    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
-        <table>
-            <tr>
-                <th>Primary value</th>
-                <td>
-                    <?php echo $query->primaryValue ?>
-                </td>
-            </tr>
-        </table>
-    </div>
-<?php elseif ($query instanceof \UniMapper\Query\Count): ?>
-    <a href="#unimapper-panel-query-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
-        <strong>count</strong>
-    </a>
-    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
-        <table>
-            <?php include __DIR__ . '/queries/conditions.phtml' ?>
-        </table>
-    </div>
-<?php elseif ($query instanceof \UniMapper\Query\Delete): ?>
-    <a href="#unimapper-panel-query-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>-">
-        <strong>delete</strong>
-    </a>
-    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
-        <table>
-            <?php include __DIR__ . '/queries/conditions.phtml' ?>
-        </table>
-    </div>
-<?php elseif ($query instanceof \UniMapper\Query\Insert): ?>
-    <a href="#unimapper-panel-query-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
-        <strong>insert</strong>
-    </a>
-    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
-        <table>
-            <tr>
-                <th>Values</th>
-                <td><?php echo $this->_getClickable($query->entity->getData(), true) ?></td>
-            </tr>
-        </table>
-    </div>
-<?php elseif ($query instanceof \UniMapper\Query\Update): ?>
-    <a href="#unimapper-panel-query-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-query-<?php echo $index ?>">
-        <strong>update</strong>
-    </a>
-    <div id="unimapper-panel-query-<?php echo $index ?>" class="nette-collapsed">
-        <table>
-            <?php include __DIR__ . '/queries/conditions.phtml' ?>
-            <tr>
-                <th>Data</th>
-                <td><?php echo $this->_getClickable($query->entity->getData(), true) ?></td>
-            </tr>
-        </table>
-    </div>
-<?php endif ?>
+
+use UniMapper\NamingConvention as UNC;
+
+$uid = uniqid();
+$elapsed = $this->_getElapsed(); ?>
+
+<table>
+    <thead>
+        <th>Elapsed time</th>
+        <th>Demands</th>
+        <th>Repository</th>
+        <th>Query</th>
+        <th>Adapter queries</th>
+        <th>Result</th>
+    </thead>
+    <tbody>
+        <?php foreach ($this->repositories as $repositoryIndex => $repository): ?>
+            <?php foreach ($repository->getLogger()->getQueries() as $queryIndex => $query): ?>
+                <?php $index = $repositoryIndex . "-" . $queryIndex . "-" . $uid ?>
+                <?php if ($query->executed): ?>
+                <tr>
+                    <td class="unimapper-panel-elapsed">
+                        <?php echo round($query->elapsed * 1000, 2) ?> ms
+                    </td>
+                    <td>
+                        <?php
+                            $queryLevel = $this->_getQueryLevel($elapsed, $query->elapsed);
+                            if ($queryLevel > 80) {
+                                $demands = "high";
+                            } elseif ($queryLevel <= 80 && $queryLevel >= 40) {
+                                $demands = "medium";
+                            } else {
+                                $demands = "low";
+                            }
+                        ?>
+                        <div class="unimapper-panel-progressbar">
+                           <div class="demands-level-<?php echo $demands ?>" style="width: <?php echo $queryLevel  ?>%"></div>
+                        </div>
+                    </td>
+                    <td><?php echo $repository->getName() ?></td>
+                    <td>
+                        <?php include __DIR__ . '/query.phtml' ?>
+                    </td>
+                    <td>
+                        <?php if ($query instanceof \UniMapper\Query\Find && $query->cached): ?>
+                            <span class="unimapper-panel-label" style="background-color: #428bca; color: #fff;">Cached</span>
+                        <?php else: ?>
+                            <span class="unimapper-panel-label"><?php echo count($query->adapterQueries) ?></span>
+                            <a href="#unimapper-panel-adapter-queries-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-adapter-queries-<?php echo $index?>"></a>
+                            <div id="unimapper-panel-adapter-queries-<?php echo $index ?>" class="nette-collapsed tracy-collapsed">
+                                <?php foreach ($query->adapterQueries as $adapterQuery): ?>
+                                    <pre class="nette-dump tracy-dump"><span class="nette-dump-string tracy-dump-string"><?php echo $adapterQuery ?></span></pre>
+                                <?php endforeach ?>
+                            </div>
+                        <?php endif ?>
+                    </td>
+                    <td>
+                        <!-- result -->
+                        <?php if ($query->result instanceof \UniMapper\EntityCollection): ?>
+                            <?php if (count($query->result) === 0): ?>
+                                [0] <?php echo UNC::classToName($query->result->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
+                            <?php else: ?>
+                                <span class="unimapper-panel-label"><?php echo count($query->result) ?></span>
+                                <a href="#unimapper-panel-result-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>">
+                                    <?php echo UNC::classToName($query->result->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
+                                </a>
+                                <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed tracy-collapsed">
+                                    <?php foreach ($query->result as $entity) { ?>
+                                        <?php echo $this->_getClickable($entity->toArray(true), true) ?>
+                                    <?php } ?>
+                                </div>
+                            <?php endif ?>
+                        <?php elseif ($query->result instanceof \UniMapper\Entity): ?>
+                            <a href="#unimapper-panel-result-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index. $uid ?>"><?php echo UNC::classToName(get_class($query->result), UNC::$entityMask) ?></a>
+                            <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed tracy-collapsed">
+                                <?php echo $this->_getClickable($query->result->toArray(true), true) ?>
+                            </div>
+                        <?php else: ?>
+                            <?php echo $this->_getClickable($query->result, true) ?>
+                        <?php endif ?>
+                    </td>
+                </tr>
+                <?php endif ?>
+            <?php endforeach ?>
+        <?php endforeach ?>
+    </tbody>
+</table>

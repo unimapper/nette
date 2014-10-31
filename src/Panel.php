@@ -3,11 +3,14 @@
 namespace UniMapper\Nette;
 
 use Nette\Diagnostics\Dumper,
-    Nette\Diagnostics\IBarPanel;
+    Nette\Diagnostics\IBarPanel,
+    Nette\Http\Response,
+    Nette\Application as NA;
 
 class Panel implements IBarPanel
 {
 
+    const HEADER_PREFIX = "UniMapper-Nette";
     const UML_CACHE_KEY = "uml.schema";
 
     /** @var array */
@@ -22,9 +25,13 @@ class Panel implements IBarPanel
     /** @var Cache */
     private $cache;
 
-    public function __construct(array $config, Cache $cache = null)
+    /** @var Response */
+    private $response;
+
+    public function __construct(array $config, Response $response, Cache $cache = null)
     {
         $this->config = $config;
+        $this->response = $response;
         $this->cache = $cache;
         $this->umlGenerator = new \UniMapper\PlantUml\Generator;
     }
@@ -47,7 +54,11 @@ class Panel implements IBarPanel
 
     private function _getQueryLevel(array $elapsed, $time)
     {
-        return round($time / max($elapsed) * 100);
+        $max = max($elapsed);
+        if ($max) {
+            return round($time / $max * 100);
+        }
+        return 100;
     }
 
     private function _getElapsed()
@@ -87,11 +98,24 @@ class Panel implements IBarPanel
             $umlUrl = $this->_generateUmlUrl();
         }
 
-        $elapsed = $this->_getElapsed();
-
         ob_start();
         include __DIR__ . "/templates/Panel.panel.phtml";
         return ob_get_clean();
+    }
+
+    public function onResponse(NA\Application $application, NA\IResponse $response)
+    {
+        if ($application->getPresenter()->isAjax()) {
+
+            $debug = ["count" => count($this->_getElapsed())];
+            if ($debug["count"]) {
+
+                ob_start();
+                include __DIR__ . "/templates/queries.phtml";
+                $debug["template"] = ob_get_clean();
+            }
+            $this->response->setHeader(self::HEADER_PREFIX, base64_encode(json_encode($debug)));
+        }
     }
 
     private function _generateUmlUrl()

@@ -1,7 +1,3 @@
-<?php
-use UniMapper\NamingConvention as UNC;
-?>
-
 <style type="text/css">
     #tracy-debug .tracy-panel table,
     #nette-debug .nette-panel table {
@@ -22,6 +18,8 @@ use UniMapper\NamingConvention as UNC;
         font-size: 75%;
         font-weight: 700;
         line-height: 1;
+        background-color: #777;
+        color: #fff;
     }
     #tracy-debug .tracy-panel .unimapper-panel-elapsed,
     #nette-debug .nette-panel .unimapper-panel-elapsed {
@@ -58,146 +56,18 @@ use UniMapper\NamingConvention as UNC;
         background-color: #428bca;
         color: #fff;
     }
-    #tracy-debug .unimapper-panel-badge,
-    #nette-debug .unimapper-panel-badge {
-        background-color: #777;
-        border-radius: 10px;
-        color: #fff;
-        display: inline-block;
-        font-size: 12px;
-        font-weight: 700;
-        line-height: 1;
-        min-width: 10px;
-        padding: 3px 7px;
-        text-align: center;
-        vertical-align: baseline;
-        white-space: nowrap;
-    }
 </style>
 
 <h1>UniMapper</h1>
 <div class="nette-inner tracy-inner">
-<?php if (count($elapsed) > 0): ?>
-    <table>
-        <thead>
-            <th>Elapsed time</th>
-            <th>Demands</th>
-            <th>Repository</th>
-            <th>Query</th>
-            <th>Adapter queries</th>
-            <th>Result</th>
-        </thead>
-        <tbody>
-        <?php foreach ($this->repositories as $repositoryIndex => $repository): ?>
-            <?php foreach ($repository->getLogger()->getQueries() as $queryIndex => $query): ?>
-                <?php $index = $repositoryIndex . "-" . $queryIndex ?>
-                <?php if ($query->executed): ?>
-                <tr>
-                    <td class="unimapper-panel-elapsed">
-                        <?php echo round($query->elapsed * 1000, 2) ?> ms
-                    </td>
-                    <td>
-                        <?php
-                            $queryLevel = $this->_getQueryLevel($elapsed, $query->elapsed);
-                            if ($queryLevel > 80) {
-                                $demands = "high";
-                            } elseif ($queryLevel <= 80 && $queryLevel >= 40) {
-                                $demands = "medium";
-                            } else {
-                                $demands = "low";
-                            }
-                        ?>
-                        <div class="unimapper-panel-progressbar">
-                           <div class="demands-level-<?php echo $demands ?>" style="width: <?php echo $queryLevel  ?>%"></div>
-                        </div>
-                    </td>
-                    <td><?php echo $repository->getName() ?></td>
-                    <td>
-                        <?php include __DIR__ . '/queries.phtml' ?>
-                    </td>
-                    <td>
-                        <span class="unimapper-panel-badge"><?php echo count($query->adapterQueries) ?></span>
-                        <a href="#unimapper-panel-adapter-queries-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-adapter-queries-<?php echo $index ?>"></a>
-                        <div id="unimapper-panel-adapter-queries-<?php echo $index ?>" class="nette-collapsed">
-                            <?php foreach ($query->adapterQueries as $adapterQuery): ?>
-                                <pre class="nette-dump tracy-dump"><span class="nette-dump-string tracy-dump-string"><?php echo $adapterQuery ?></span></pre>
-                            <?php endforeach ?>
-                        </div>
-                    </td>
-                    <td>
-                        <!-- result -->
-                        <?php if ($query->result instanceof \UniMapper\EntityCollection): ?>
-                            <?php if (count($query->result) === 0): ?>
-                                [0] <?php echo UNC::classToName($query->result->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
-                            <?php else: ?>
-                                <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>">
-                                    [<?php echo count($query->result) ?>]
-                                    <?php echo UNC::classToName($query->result->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
-                                </a>
-                                <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
-                                    <?php foreach ($query->result as $entity) { ?>
-                                        <?php echo $this->_getClickable($entity->toArray(true), true) ?>
-                                    <?php } ?>
-                                </div>
-                            <?php endif ?>
-                        <?php elseif ($query->result instanceof \UniMapper\Entity): ?>
-                            <a href="#unimapper-panel-result-<?php echo $index ?>" class="nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>"><?php echo UNC::classToName(get_class($query->result), UNC::$entityMask) ?></a>
-                            <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed">
-                                <?php echo $this->_getClickable($query->result->toArray(true), true) ?>
-                            </div>
-                        <?php else: ?>
-                            <?php echo $this->_getClickable($query->result, true) ?>
-                        <?php endif ?>
-                    </td>
-                </tr>
-                <?php endif ?>
-            <?php endforeach ?>
-        <?php endforeach ?>
-        </tbody>
-    </table>
-<?php endif ?>
-<table>
-    <thead>
-        <tr><th colspan="2">Config</th></tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>API</td>
-            <td><?php echo $this->config["api"]["enabled"] ? "<strong>Enabled</strong>" : "Disabled" ?></td>
-        </tr>
-        <?php if ($this->config["api"]["enabled"]): ?>
-        <tr>
-            <td>API Module</td>
-            <td><?php echo $this->config["api"]["module"] ?>:</td>
-        </tr>
-        <?php endif ?>
-        <tr>
-            <td>Cache</td>
-            <td><?php echo $this->config["cache"] ? "<strong>Enabled</strong>" : "Disabled" ?></strong></td>
-        </tr>
-        <tr>
-            <td>Entity namespace</td>
-            <td><?php echo UNC::$entityMask ?></td>
-        </tr>
-        <tr>
-            <td>Repository namespace</td>
-            <td><?php echo UNC::$repositoryMask ?></td>
-        </tr>
-        <?php if ($this->config["customQueries"]): ?>
-        <tr>
-            <td>Custom queries</td>
-            <td>
-                <ul>
-                    <?php foreach ($this->config["customQueries"] as $customQuery): ?>
-                        <li><?php echo $customQuery ?></li>
-                    <?php endforeach ?>
-                </ul>
-            </td>
-        </tr>
-        <?php endif ?>
-    </tbody>
-</table>
-<?php if ($this->repositories): ?>
-    <a href="<?php echo $umlUrl ?>" target="_blank">UML schema</a>
-<?php endif ?>
+    <div id="unimapper-panel-queries">
+        <?php include __DIR__ . '/queries.phtml' ?>
+    </div>
+    <a href="#unimapper-panel-config" rel="#unimapper-panel-config" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed">Config</a>
+    <div id="unimapper-panel-config" class="tracy-collapsed nette-collapsed">
+        <?php include __DIR__ . '/config.phtml' ?>
+    </div>
+    <?php if ($this->repositories): ?>
+        <a href="<?php echo $umlUrl ?>" target="_blank">UML schema</a>
+    <?php endif ?>
 </div>

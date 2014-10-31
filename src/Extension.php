@@ -59,11 +59,16 @@ class Extension extends CompilerExtension
                 ->setClass("UniMapper\Nette\Api\Input");
         }
 
-        // Create panel service in debug mode
+        // Debug mode
         if ($builder->parameters["debugMode"] && $config["panel"]) {
 
+            // Create panel service
             $builder->addDefinition($this->prefix("panel"))
                 ->setClass("UniMapper\Nette\Panel", [$config]);
+
+            // Register on presenter events
+            $builder->getDefinition('application')
+                ->addSetup('?->onResponse[] = ?', array('@self', array($this->prefix('@panel'), 'onResponse')));
         }
     }
 

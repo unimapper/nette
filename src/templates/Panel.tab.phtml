@@ -1,1 +1,102 @@
-<div>UniMapper <?php if (count($elapsed) > 0): ?><span style="border-radius: 0.25em; text-align: center; vertical-align: baseline; white-space: nowrap; padding: 0.2em 0.6em 0.3em; display: inline; font-size: 75%; font-weight: 700; line-height: 1; background-color: #874400; color: #fff;"><?php echo count($elapsed) ?> queries / <?php echo round(array_sum($elapsed) * 1000, 2) ?> ms</span><?php endif ?></div>
+<script type="text/javascript">
+(function(){
+
+    var UniMapper = {
+
+        base64decode: function (input) {
+
+            var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+            var output = "";
+            var chr1, chr2, chr3 = "";
+            var enc1, enc2, enc3, enc4 = "";
+            var i = 0;
+
+            // remove all characters that are not A-Z, a-z, 0-9, +, /, or =
+            var base64test = /[^A-Za-z0-9\+\/\=]/g;
+            if (base64test.exec(input)) {
+                alert("There were invalid base64 characters in the input text.\n" +
+                  "Valid base64 characters are A-Z, a-z, 0-9, '+', '/',and '='\n" +
+                  "Expect errors in decoding.");
+            }
+            input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+
+            do {
+                enc1 = keyStr.indexOf(input.charAt(i++));
+                enc2 = keyStr.indexOf(input.charAt(i++));
+                enc3 = keyStr.indexOf(input.charAt(i++));
+                enc4 = keyStr.indexOf(input.charAt(i++));
+
+                chr1 = (enc1 << 2) | (enc2 >> 4);
+                chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+                chr3 = ((enc3 & 3) << 6) | enc4;
+
+                output = output + String.fromCharCode(chr1);
+
+                if (enc3 != 64) {
+                    output = output + String.fromCharCode(chr2);
+                }
+                if (enc4 != 64) {
+                    output = output + String.fromCharCode(chr3);
+                }
+
+                chr1 = chr2 = chr3 = "";
+                enc1 = enc2 = enc3 = enc4 = "";
+
+            } while (i < input.length);
+
+            return unescape(output);
+        },
+        init: function () {
+
+            // store the native send()
+            var oldSend = XMLHttpRequest.prototype.send;
+
+            // override the native send()
+            var xhr = XMLHttpRequest;
+            var self = this;
+
+            xhr.prototype.send = function(arguments) {
+
+                if (this.addEventListener) {
+
+                    this.addEventListener("readystatechange", function() {
+
+                        if (this.readyState === 4) {
+
+                            header = this.getResponseHeader("<?php echo self::HEADER_PREFIX ?>");
+                            if (header != null) {
+
+                                data = JSON.parse(self.base64decode(header));
+                                if (data.count) {
+
+                                    var countElem = document.getElementById('unimapper-panel-count-new');
+                                    var textOpt = ('innerText' in countElem)? 'innerText' : 'textContent';
+
+                                    countElem[textOpt] = parseInt(countElem[textOpt]) + parseInt(data.count);
+                                    countElem.parentNode.style.display = 'inline';
+
+                                    var queriesElem = document.getElementById('unimapper-panel-queries');
+                                    queriesElem.innerHTML = queriesElem.innerHTML + data.template;
+                                }
+                            }
+                        }
+                    }, false);
+                }
+
+                // call the native send()
+                oldSend.call(this, arguments);
+            }
+        }
+    };
+
+    UniMapper.init(); // @todo does not work when requests called in window.load
+
+})();
+</script>
+<div>
+    UniMapper
+    <?php if (count($elapsed) > 0): ?>
+        <span><?php echo count($elapsed) ?> / <?php echo round(array_sum($elapsed) * 1000, 2) ?> ms</span>
+    <?php endif ?>
+    <span style="border-radius: 0.25em; text-align: center; vertical-align: baseline; white-space: nowrap; padding: 0.2em 0.6em 0.3em; display: none; font-size: 75%; font-weight: 700; line-height: 1; background-color: #428bca; color: #fff;">+ <span id="unimapper-panel-count-new">0</span></span>
+</div>
