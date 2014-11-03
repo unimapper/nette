@@ -80,7 +80,7 @@ class Panel implements IBarPanel
         $elapsed = $this->_getElapsed();
 
         ob_start();
-        include __DIR__ . "/templates/Panel.tab.phtml";
+        include __DIR__ . "/panel/templates/tab.phtml";
         return ob_get_clean();
     }
 
@@ -99,7 +99,7 @@ class Panel implements IBarPanel
         }
 
         ob_start();
-        include __DIR__ . "/templates/Panel.panel.phtml";
+        include __DIR__ . "/panel/templates/panel.phtml";
         return ob_get_clean();
     }
 
@@ -111,7 +111,7 @@ class Panel implements IBarPanel
             if ($debug["count"]) {
 
                 ob_start();
-                include __DIR__ . "/templates/queries.phtml";
+                include __DIR__ . "/panel/templates/queries.phtml";
                 $debug["template"] = ob_get_clean();
             }
             $this->response->setHeader(self::HEADER_PREFIX, base64_encode(json_encode($debug)));

@@ -20,9 +20,7 @@ $elapsed = $this->_getElapsed(); ?>
                 <?php $index = $repositoryIndex . "-" . $queryIndex . "-" . $uid ?>
                 <?php if ($query->executed): ?>
                 <tr>
-                    <td class="unimapper-panel-elapsed">
-                        <?php echo round($query->elapsed * 1000, 2) ?> ms
-                    </td>
+                    <td class="unimapper-panel-elapsed"><?php echo round($query->elapsed * 1000, 2) ?> ms</td>
                     <td>
                         <?php
                             $queryLevel = $this->_getQueryLevel($elapsed, $query->elapsed);
@@ -39,9 +37,7 @@ $elapsed = $this->_getElapsed(); ?>
                         </div>
                     </td>
                     <td><?php echo $repository->getName() ?></td>
-                    <td>
-                        <?php include __DIR__ . '/query.phtml' ?>
-                    </td>
+                    <td><?php include __DIR__ . '/queries/detail.phtml' ?></td>
                     <td>
                         <?php if ($query instanceof \UniMapper\Query\Find && $query->cached): ?>
                             <span class="unimapper-panel-label" style="background-color: #428bca; color: #fff;">Cached</span>
