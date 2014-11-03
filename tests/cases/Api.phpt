@@ -153,7 +153,7 @@ class ApiTest extends Tester\TestCase
     {
         $this->inputMock->shouldReceive("getData")->once()->andReturn('{"text": "foo"}');
         $this->adapterMock->shouldReceive("createUpdateOne")->with("test_resource", "id", 1, ["text" => "foo"])->once()->andReturn($this->adapterQueryMock);
-        $this->adapterMock->shouldReceive("execute")->with($this->adapterQueryMock)->once()->andReturn(null);
+        $this->adapterMock->shouldReceive("execute")->with($this->adapterQueryMock)->once()->andReturn(true);
 
         $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::PUT, ['id' => 1, "action" => "put"]);
         $response = $this->presenter->run($request);
@@ -170,7 +170,7 @@ class ApiTest extends Tester\TestCase
     public function testDestroy()
     {
         $this->adapterMock->shouldReceive("createDeleteOne")->with("test_resource", "id", 1)->once()->andReturn($this->adapterQueryMock);
-        $this->adapterMock->shouldReceive("execute")->with($this->adapterQueryMock)->once()->andReturn(null);
+        $this->adapterMock->shouldReceive("execute")->with($this->adapterQueryMock)->once()->andReturn(true);
 
         $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::DELETE, ['id' => 1, "action" => "delete"]);
         $response = $this->presenter->run($request);
