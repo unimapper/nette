@@ -7,6 +7,7 @@ class Resource extends \Nette\Object implements \JsonSerializable
 
     public $success;
     public $link;
+    public $code;
     public $body = [];
     public $messages = [];
 

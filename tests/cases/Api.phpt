@@ -5,7 +5,7 @@ use Tester\Assert;
 require __DIR__ . '/../bootstrap.php';
 
 /**
- * @httpCode 400
+ * @httpCode 404
  */
 class ApiTest extends Tester\TestCase
 {
@@ -114,16 +114,24 @@ class ApiTest extends Tester\TestCase
         Assert::same("foo", $payload->body->text);
     }
 
-    /**
-     * @throws Nette\Application\BadRequestException Resource not found!
-     */
     public function testFindOneNotFound()
     {
         $this->adapterMock->shouldReceive("createFindOne")->once()->with()->andReturn($this->adapterQueryMock);
         $this->adapterMock->shouldReceive("execute")->once()->with($this->adapterQueryMock)->andReturn(false);
 
         $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ['id' => 1, "action" => "get"]);
-        $this->presenter->run($request);
+        Assert::type("Nette\Application\Responses\JsonResponse", $response = $this->presenter->run($request));
+        Assert::type("UniMapper\Nette\Api\Resource", $response->getPayload());
+        Assert::same(
+            array(
+                'success' => NULL,
+                'link' => NULL,
+                'code' => 404,
+                'body' => array(),
+                'messages' => array('Record not found!'),
+            ),
+            (array) $response->getPayload()
+        );
     }
 
     public function testFind()
@@ -175,8 +183,17 @@ class ApiTest extends Tester\TestCase
         $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::DELETE, ['id' => 1, "action" => "delete"]);
         $response = $this->presenter->run($request);
         Assert::type("Nette\Application\Responses\JsonResponse", $response);
-        Assert::same("application/json", $response->getContentType());
-        Assert::true($response->getPayload()->success);
+        Assert::type("UniMapper\Nette\Api\Resource", $response->getPayload());
+        Assert::same(
+            array(
+                'success' => true,
+                'link' => NULL,
+                'code' => NULL,
+                'body' => array(),
+                'messages' => array(),
+            ),
+            (array) $response->getPayload()
+        );
     }
 
     public function testCustomGetAction()

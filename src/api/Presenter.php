@@ -69,13 +69,10 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
         $name = $this->getPresenterName();
         if (!isset($this->repositories[$name])) {
-            $this->error(
-                "Repository '" . $name . "' not found!",
-                Response::S404_NOT_FOUND
-            );
+            $this->error("Repository '" . $name . "' not found!");
         }
-        $this->repository = $this->repositories[$name];
 
+        $this->repository = $this->repositories[$name];
         $this->data = Json::decode($this->input->getData(), Json::FORCE_ARRAY);
     }
 
@@ -92,7 +89,10 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             $entity = $this->repository->findOne($primaryValue, $associate);
 
             if (!$entity) {
-                $this->error("Resource not found!", Response::S404_NOT_FOUND);
+
+                $this->resource->messages[] = "Record not found!";
+                $this->resource->code = 404;
+                return;
             }
 
             $this->resource->body = $entity;
@@ -110,11 +110,14 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     public function actionPost()
     {
-        // @todo catch unsuccessfull convert
-        $entity = $this->repository->createEntity($this->data);
+        $entity = $this->repository->createEntity($this->data); // @todo catch unsuccessfull convert
 
         if (!$entity->getReflection()->hasPrimaryProperty()) {
-            $this->error("Can not create record if entity has no primary property defined!", Response::S405_METHOD_NOT_ALLOWED);
+
+            $this->resource->success = false;
+            $this->resource->code = 405;
+            $this->resource->messages[] = "Method is not allowed on entities without primary property!";
+            return;
         }
 
         // Prevent to primary value changes
@@ -123,40 +126,61 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
         // Perform save
         try {
+
             $this->repository->save($entity);
-        } catch (\UniMapper\Exception\ValidatorException $exception) {
+            $this->resource->code = 201;
+            $this->resource->success = true;
+            $this->resource->link = $this->link("get", $entity->{$primaryProperty->getName()});
+            $this->resource->body = $entity->toArray(true);
+        } catch (\Exception $e) {
 
-            // Validation failed
-            $this->httpResponse->setCode(Response::S400_BAD_REQUEST);
+            if ($e instanceof \UniMapper\Exception\ValidatorException) {
+                $this->resource->messages = $e->getValidator()->getMessages();
+            } elseif ($e instanceof \UniMapper\Exception\RepositoryException) {
+                $this->resource->messages[] = $e->getMessage();
+            } else {
+                throw $e;
+            }
 
+            $this->resource->code = 400;
             $this->resource->success = false;
-            $this->resource->messages = $exception->getValidator()->getMessages();
-            return;
         }
-
-        // Success
-        $this->httpResponse->setCode(201);
-
-        $this->resource->success = true;
-        $this->resource->link = $this->link("get", $entity->{$primaryProperty->getName()});
-        $this->resource->body = $entity->toArray(true);
     }
 
     public function actionPut($id)
     {
-        // @todo catch unsuccessfull convert
-        $entity = $this->repository->createEntity($this->data);
+        $entity = $this->repository->createEntity($this->data); // @todo catch unsuccessfull convert
 
         if (!$entity->getReflection()->hasPrimaryProperty()) {
-            $this->error("Can not update record if entity has no primary property defined!", Response::S405_METHOD_NOT_ALLOWED);
-        }
-        $primaryProperty = $entity->getReflection()->getPrimaryProperty();
-        $entity->{$primaryProperty->getName()} = $primaryProperty->convertValue($id);
-        $this->repository->save($entity);
 
-        $this->resource->success = true;
-        $this->resource->link = $this->link("get", $entity->{$primaryProperty->getName()});
-        $this->resource->body = $entity->toArray(true);
+            $this->resource->success = false;
+            $this->resource->code = 405;
+            $this->resource->messages[] = "Method is not allowed on entities without primary property!";
+            return;
+        }
+
+        $primaryProperty = $entity->getReflection()->getPrimaryProperty();
+        $entity->{$primaryProperty->getName()} = $primaryProperty->convertValue($id); // @todo catch unsuccessfull convert
+
+        try {
+
+            $this->repository->save($entity);
+            $this->resource->success = true;
+            $this->resource->link = $this->link("get", $entity->{$primaryProperty->getName()});
+            $this->resource->body = $entity->toArray(true);
+        } catch (\Exception $e) {
+
+            if ($e instanceof \UniMapper\Exception\ValidatorException) {
+                $this->resource->messages = $e->getValidator()->getMessages();
+            } elseif ($e instanceof \UniMapper\Exception\RepositoryException) {
+                $this->resource->messages[] = $e->getMessage();
+            } else {
+                throw $e;
+            }
+
+            $this->resource->code = 400;
+            $this->resource->success = false;
+        }
     }
 
     public function actionDelete($id)
@@ -167,15 +191,21 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         // @todo catch unsuccessfull convert
         $entity->import([$primaryProperty->getName() => $id]);
 
-        $this->repository->delete($entity);
-
-        $this->resource->success = true;
+        $this->resource->success = $this->repository->delete($entity);
     }
 
     public function beforeRender()
     {
         parent::beforeRender();
+        if ($this->resource->code) {
+            $this->httpResponse->setCode($this->resource->code);
+        }
         $this->sendJsonData($this->resource);
+    }
+
+    public function shutdown($response)
+    {
+        parent::shutdown($response);
     }
 
     /**
