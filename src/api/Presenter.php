@@ -17,7 +17,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     private $repositories;
 
     /** @var \Nette\Http\Response $httpResponse */
-    protected $httpResponse;
+    private $httpResponse;
 
     /** @var integer $maxLimit */
     protected $maxLimit = 10;
@@ -110,6 +110,8 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     public function actionPost()
     {
+        $this->beforePost();
+
         $entity = $this->repository->createEntity($this->data); // @todo catch unsuccessfull convert
 
         if (!$entity->getReflection()->hasPrimaryProperty()) {
@@ -120,17 +122,13 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             return;
         }
 
-        // Prevent to primary value changes
-        $primaryProperty = $entity->getReflection()->getPrimaryProperty();
-        unset($entity->{$primaryProperty->getName()});
-
-        // Perform save
         try {
 
-            $this->repository->save($entity);
+            $this->post($entity);
+
             $this->resource->code = 201;
             $this->resource->success = true;
-            $this->resource->link = $this->link("get", $entity->{$primaryProperty->getName()});
+            $this->resource->link = $this->link("get", $entity->{$entity->getReflection()->getPrimaryProperty()->getName()});
             $this->resource->body = $entity->toArray(true);
         } catch (\Exception $e) {
 
@@ -145,10 +143,14 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             $this->resource->code = 400;
             $this->resource->success = false;
         }
+
+        $this->afterPost($entity);
     }
 
     public function actionPut($id)
     {
+        $this->beforePut();
+
         $entity = $this->repository->createEntity($this->data); // @todo catch unsuccessfull convert
 
         if (!$entity->getReflection()->hasPrimaryProperty()) {
@@ -164,7 +166,8 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
         try {
 
-            $this->repository->save($entity);
+            $this->put($entity);
+
             $this->resource->success = true;
             $this->resource->link = $this->link("get", $entity->{$primaryProperty->getName()});
             $this->resource->body = $entity->toArray(true);
@@ -181,17 +184,20 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             $this->resource->code = 400;
             $this->resource->success = false;
         }
+
+        $this->afterPut($entity);
     }
 
     public function actionDelete($id)
     {
+        $this->beforeDelete();
+
         $entity = $this->repository->createEntity();
-        $primaryProperty = $entity->getReflection()->getPrimaryProperty();
+        $entity->{$entity->getReflection()->getPrimaryProperty()->getName()} = $id;  // @todo catch unsuccessfull convert
 
-        // @todo catch unsuccessfull convert
-        $entity->import([$primaryProperty->getName() => $id]);
+        $this->resource->success = (bool) $this->delete($entity);
 
-        $this->resource->success = $this->repository->delete($entity);
+        $this->afterDelete($entity);
     }
 
     public function beforeRender()
@@ -201,11 +207,6 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             $this->httpResponse->setCode($this->resource->code);
         }
         $this->sendJsonData($this->resource);
-    }
-
-    public function shutdown($response)
-    {
-        parent::shutdown($response);
     }
 
     /**
@@ -235,6 +236,51 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     protected function getOffset()
     {
         return (int) $this->getParameter("offset");
+    }
+
+    protected function beforeDelete()
+    {
+
+    }
+
+    protected function beforePost()
+    {
+
+    }
+
+    protected function beforePut()
+    {
+
+    }
+
+    protected function delete(\UniMapper\Entity $entity)
+    {
+        return $this->repository->delete($entity);
+    }
+
+    protected function post(\UniMapper\Entity $entity)
+    {
+        $this->repository->save($entity);
+    }
+
+    protected function put(\UniMapper\Entity $entity)
+    {
+        $this->repository->save($entity);
+    }
+
+    protected function afterDelete(\UniMapper\Entity $entity)
+    {
+
+    }
+
+    protected function afterPost(\UniMapper\Entity $entity)
+    {
+
+    }
+
+    protected function afterPut(\UniMapper\Entity $entity)
+    {
+
     }
 
 }
