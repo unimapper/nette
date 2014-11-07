@@ -45,7 +45,7 @@ class ApiTest extends Tester\TestCase
         $this->presenter->autoCanonicalize = false;
     }
 
-    public function testCreate()
+    public function testPost()
     {
         $this->inputMock->shouldReceive("getData")->once()->andReturn('{"text": "foo"}');
         $this->adapterMock->shouldReceive("createInsert")->once()->andReturn($this->adapterQueryMock);
@@ -63,7 +63,7 @@ class ApiTest extends Tester\TestCase
         Assert::same(['id' => 1, 'text' => "foo"], $payload->body);
     }
 
-    public function testCreateInvalid()
+    public function testPostInvalid()
     {
         $this->inputMock->shouldReceive("getData")->once()->andReturn(null);
 
@@ -98,7 +98,7 @@ class ApiTest extends Tester\TestCase
         $this->presenter->run($request);
     }
 
-    public function testFindOne()
+    public function testGetId()
     {
         $this->adapterMock->shouldReceive("createFindOne")->once()->with("test_resource", "id", 1)->andReturn($this->adapterQueryMock);
         $this->adapterMock->shouldReceive("execute")->once()->with($this->adapterQueryMock)->andReturn(["text" => "foo", "id" => 1]);
@@ -114,7 +114,7 @@ class ApiTest extends Tester\TestCase
         Assert::same("foo", $payload->body->text);
     }
 
-    public function testFindOneNotFound()
+    public function testGetIdNotFound()
     {
         $this->adapterMock->shouldReceive("createFindOne")->once()->with()->andReturn($this->adapterQueryMock);
         $this->adapterMock->shouldReceive("execute")->once()->with($this->adapterQueryMock)->andReturn(false);
@@ -134,7 +134,7 @@ class ApiTest extends Tester\TestCase
         );
     }
 
-    public function testFind()
+    public function testGet()
     {
         $this->adapterMock->shouldReceive("createFind")
             ->with("test_resource", ["id", "text"], [], 10, 0)
@@ -157,7 +157,7 @@ class ApiTest extends Tester\TestCase
         Assert::same(2, $response->getPayload()->body[1]->id);
     }
 
-    public function testUpdate()
+    public function testPut()
     {
         $this->inputMock->shouldReceive("getData")->once()->andReturn('{"text": "foo"}');
         $this->adapterMock->shouldReceive("createUpdateOne")->with("test_resource", "id", 1, ["text" => "foo"])->once()->andReturn($this->adapterQueryMock);
@@ -175,7 +175,7 @@ class ApiTest extends Tester\TestCase
         Assert::same(['id' => 1, 'text' => "foo"], $payload->body);
     }
 
-    public function testDestroy()
+    public function testDelete()
     {
         $this->adapterMock->shouldReceive("createDeleteOne")->with("test_resource", "id", 1)->once()->andReturn($this->adapterQueryMock);
         $this->adapterMock->shouldReceive("execute")->with($this->adapterQueryMock)->once()->andReturn(true);
