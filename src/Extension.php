@@ -26,6 +26,7 @@ class Extension extends CompilerExtension
 
     /** @var array $defaults Default configuration */
     public $defaults = [
+        "adapters" => [],
         "panel" => true,
         "cache" => true,
         "namingConvention" => [
@@ -36,6 +37,7 @@ class Extension extends CompilerExtension
             "enabled" => false,
             "module" => "Api"
         ],
+        "entityFactory" => "UniMapper\EntityFactory",
         "customQueries" => []
     ];
 
@@ -47,11 +49,34 @@ class Extension extends CompilerExtension
         $builder = $this->getContainerBuilder();
         $config = $this->getConfig($this->defaults);
 
-        // Cache service
+        // Create cache
         if ($config["cache"]) {
             $builder->addDefinition($this->prefix("cache"))->setClass("UniMapper\Nette\Cache");
         }
 
+        // Create entity factory
+        $builder->addDefinition($this->prefix("entityFactory"))->setClass($config["entityFactory"]);
+
+        // Create query builder
+        $builder->addDefinition($this->prefix("queryBuilder"))->setClass("UniMapper\QueryBuilder");
+
+        if (!is_array($config["adapters"])) {
+            throw new \Exception("Adapters must be array of adapters!");
+        }
+        foreach ($config["adapters"] as $adapterName => $adapterService) {
+
+            // Register adapters on query builder
+            $builder->getDefinition($this->prefix("queryBuilder"))
+                ->addSetup("registerAdapter", array($adapterName, $adapterService));
+        }
+
+        foreach ($config["customQueries"] as $customQueryClass) {
+
+            $builder->getDefinition($this->prefix("queryBuilder"))
+                ->addSetup("registerQuery", array($customQueryClass));
+        }
+
+        // Setup API
         if ($config["api"]["enabled"]) {
             $builder->addDefinition($this->prefix("repositories"))
                 ->setClass("UniMapper\Nette\Api\RepositoryList");
@@ -62,7 +87,7 @@ class Extension extends CompilerExtension
         // Debug mode
         if ($builder->parameters["debugMode"] && $config["panel"]) {
 
-            // Create panel service
+            // Create panel
             $builder->addDefinition($this->prefix("panel"))
                 ->setClass("UniMapper\Nette\Panel", [$config]);
 
@@ -106,60 +131,23 @@ class Extension extends CompilerExtension
                 );
         }
 
-        $adapters = [];
-        $repositories = [];
-
-        // Iterate over services
-        foreach ($builder->getDefinitions() as $serviceName => $serviceDefinition) {
-
-            $class = $serviceDefinition->class !== null ? $serviceDefinition->class : $serviceDefinition->factory->entity;
-
-            // Repositories only
-            if (class_exists($class) && is_subclass_of($class, "UniMapper\Repository")) {
-
-                $repositories[] = $serviceName;
-
-                $repositoryDefinition = $builder->getDefinition($serviceName);
-
-                // Set logger
-                $repositoryDefinition->addSetup("setLogger", [new \UniMapper\Logger]);
-
-                // Set repository cache
-                if ($config["cache"]) {
-                    $repositoryDefinition->addSetup("setCache", [$builder->getDefinition($this->prefix("cache"))]);
-                }
-
-                // Register custom queries
-                foreach ($config["customQueries"] as $customQueryClass) {
-                    $repositoryDefinition->addSetup("registerCustomQuery", [$customQueryClass]);
-                }
-
-                // Register repository into the panel
-                if ($builder->parameters["debugMode"] && $config["panel"]) {
-                    $builder->getDefinition($this->prefix("panel"))->addSetup('registerRepository', [$builder->getDefinition($serviceName)]);
-                }
-            }
-
-            // Adapters only
-            if (class_exists($class) && is_subclass_of($class, "UniMapper\Adapter")) {
-                $adapters[] = $serviceName;
-            }
-        }
-
-        // Register all adapters
-        foreach ($repositories as $repository) {
-
-            foreach ($adapters as $adapter) {
-                $builder->getDefinition($repository)->addSetup("registerAdapter", [$builder->getDefinition($adapter)]);
-            }
-
-            $builder->getDefinition($this->prefix("repositories"))
-                ->addSetup('$service[] = $this->getService(?)', [$repository]);
-        }
-
         // Generate API
         if ($config["api"]["enabled"]) {
 
+            // Iterate over services
+            foreach ($builder->getDefinitions() as $serviceName => $serviceDefinition) {
+
+                $class = $serviceDefinition->class !== null ? $serviceDefinition->class : $serviceDefinition->factory->entity;
+
+                // Register repository to API's repository list
+                if (class_exists($class) && is_subclass_of($class, "UniMapper\Repository")) {
+
+                    $builder->getDefinition($this->prefix("repositories"))
+                        ->addSetup('$service[] = $this->getService(?)', [$serviceName]);
+                }
+            }
+
+            // Prepend API route
             $builder->getDefinition("router")
                 ->addSetup(
                     'UniMapper\Nette\Api\RouterFactory::prependTo($service, ?)',

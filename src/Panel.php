@@ -2,7 +2,8 @@
 
 namespace UniMapper\Nette;
 
-use Nette\Diagnostics\Dumper,
+use UniMapper\QueryBuilder,
+    Nette\Diagnostics\Dumper,
     Nette\Diagnostics\IBarPanel,
     Nette\Http\Response,
     Nette\Application as NA;
@@ -12,9 +13,6 @@ class Panel implements IBarPanel
 
     const HEADER_PREFIX = "UniMapper-Nette";
     const UML_CACHE_KEY = "uml.schema";
-
-    /** @var array */
-    private $repositories = [];
 
     /** @var \UniMapper\PlantUml\Genarator */
     private $umlGenerator;
@@ -28,18 +26,16 @@ class Panel implements IBarPanel
     /** @var Response */
     private $response;
 
-    public function __construct(array $config, Response $response, Cache $cache = null)
+    /** @var QueryBuilder */
+    private $queryBuilder;
+
+    public function __construct(array $config, Response $response, QueryBuilder $queryBuilder, Cache $cache = null)
     {
         $this->config = $config;
         $this->response = $response;
+        $this->queryBuilder = $queryBuilder;
         $this->cache = $cache;
         $this->umlGenerator = new \UniMapper\PlantUml\Generator;
-    }
-
-    public function registerRepository(\UniMapper\Repository $repository)
-    {
-        $this->repositories[] = $repository;
-        $this->umlGenerator->add($repository->createEntity()->getReflection());
     }
 
     private function _getClickable($variable, $collapsed = false)
@@ -64,14 +60,13 @@ class Panel implements IBarPanel
     private function _getElapsed()
     {
         $elapsed = [];
-        foreach ($this->repositories as $repository) {
 
-            foreach ($repository->getLogger()->getQueries() as $query) {
-                if ($query->executed) {
-                    $elapsed[] = $query->elapsed;
-                }
+        foreach ($this->queryBuilder->getCreated() as $query) {
+            if ($query->executed) {
+                $elapsed[] = $query->elapsed;
             }
         }
+
         return $elapsed;
     }
 

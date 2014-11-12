@@ -17,7 +17,7 @@ class ExtensionTest extends Tester\TestCase
 
     public function testCustomQueries()
     {
-        Assert::same("foo", $this->container->getService("simpleRepository")->query()->custom()->execute());
+        Assert::same("foo", $this->container->getService("unimapper.queryBuilder")->custom("Simple")->execute());
     }
 
 }

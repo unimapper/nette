@@ -2,7 +2,7 @@
 
 namespace UniMapper\Nette\Tests\Model\Adapter;
 
-class SimpleAdapter extends \UniMapper\Adapter
+class SimpleAdapter implements \UniMapper\Adapter\IAdapter
 {
 
     public function createCount($resource)
@@ -46,6 +46,11 @@ class SimpleAdapter extends \UniMapper\Adapter
     }
 
     public function execute(\UniMapper\Adapter\IQuery $query)
+    {
+        throw new \Exception("You should mock here!");
+    }
+
+    public function getMapper()
     {
         throw new \Exception("You should mock here!");
     }

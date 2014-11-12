@@ -11,7 +11,7 @@ Official Unimapper extension for Nette framework.
 $ composer require unimapper/nette:@dev
 ```
 
-### Nette 2.1.x
+### Nette 2.1 and higher
 
 Register extension in `config.neon`.
 
@@ -20,7 +20,7 @@ extensions:
     unimapper: UniMapper\Nette\Extension
 ```
 
-### Nette 2.0.x
+### Nette 2.0
 
 Register extension in `app/bootstrap.php`.
 
@@ -34,14 +34,22 @@ return $configurator->createContainer();
 
 ```yml
 unimapper:
-    cache: false # (default = true)
+    adapters:
+        Mongo: @service
+        MySQL: @anotherService
+        ...
+    cache: true
     namingConvention:
         entity: 'YourApp\Model\*'
         repository: 'YourApp\Repository\*Repository'
     api:
-        enabled: true
+        enabled: false
         module: "Api"
-    panel: false # (default = true)
+    panel: true
+    customQueries:
+        - CustomQueryClass
+        - ...
+    entityFactory: YourCustomEntityFactory
 ```
 
 ## Api
