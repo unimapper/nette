@@ -32,7 +32,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     protected $data;
 
     /**  @var \UniMapper\EntityFactory $entityFactory */
-    private $entityFactory;
+    protected $entityFactory;
 
     /**
      * Inject entity factory
