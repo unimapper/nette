@@ -28,6 +28,7 @@ class Extension extends CompilerExtension
     public $defaults = [
         "adapters" => [],
         "panel" => true,
+        "profiler" => true,
         "cache" => true,
         "namingConvention" => [
             "repository" => null,
@@ -60,16 +61,6 @@ class Extension extends CompilerExtension
         // Create query builder
         $builder->addDefinition($this->prefix("queryBuilder"))->setClass("UniMapper\QueryBuilder");
 
-        if (!is_array($config["adapters"])) {
-            throw new \Exception("Adapters must be array of adapters!");
-        }
-        foreach ($config["adapters"] as $adapterName => $adapterService) {
-
-            // Register adapters on query builder
-            $builder->getDefinition($this->prefix("queryBuilder"))
-                ->addSetup("registerAdapter", array($adapterName, $adapterService));
-        }
-
         foreach ($config["customQueries"] as $customQueryClass) {
 
             $builder->getDefinition($this->prefix("queryBuilder"))
@@ -101,6 +92,28 @@ class Extension extends CompilerExtension
     {
         $builder = $this->getContainerBuilder();
         $config = $this->getConfig($this->defaults);
+
+        if (!is_array($config["adapters"])) {
+            throw new \Exception("Adapters must be array of adapters!");
+        }
+        foreach ($config["adapters"] as $adapterName => $adapterService) {
+
+            // Register profiler events
+            if ($config["profiler"]) {
+                $builder->getDefinition($builder->getServiceName($adapterService))
+                    ->addSetup('$service->afterExecute(array(?, "adapterCallback"))', array(get_class()));
+            }
+
+            // Register adapters on query builder
+            $builder->getDefinition($this->prefix("queryBuilder"))
+                ->addSetup("registerAdapter", array($adapterName, $adapterService));
+        }
+
+        if ($config["profiler"]) {
+            $builder->getDefinition($this->prefix("queryBuilder"))
+                ->addSetup('$service->beforeQuery(array(?, "beforeQueryCallback"))', array(get_class()))
+                ->addSetup('$service->afterQuery(array(?, "afterQueryCallback"))', array(get_class()));
+        }
 
         // Back compatibility
         if (class_exists("Tracy\Debugger")) {
@@ -212,6 +225,21 @@ class Extension extends CompilerExtension
                 "panel" =>  $link . "\n" . $code
             ];
         }
+    }
+
+    public static function adapterCallback(\UniMapper\Adapter\IQuery $adapterQuery, $result)
+    {
+        \UniMapper\Profiler::log($adapterQuery, $result);
+    }
+
+    public static function beforeQueryCallback(\UniMapper\Query $query)
+    {
+        \UniMapper\Profiler::startQuery($query);
+    }
+
+    public static function afterQueryCallback(\UniMapper\Query $query, $result, $elapsed)
+    {
+        \UniMapper\Profiler::endQuery($result, $elapsed);
     }
 
 }

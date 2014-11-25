@@ -46,6 +46,7 @@ unimapper:
         enabled: false
         module: "Api"
     panel: true
+    profiler: true
     customQueries:
         - CustomQueryClass
         - ...

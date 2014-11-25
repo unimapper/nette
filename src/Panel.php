@@ -26,14 +26,10 @@ class Panel implements IBarPanel
     /** @var Response */
     private $response;
 
-    /** @var QueryBuilder */
-    private $queryBuilder;
-
     public function __construct(array $config, Response $response, QueryBuilder $queryBuilder, Cache $cache = null)
     {
         $this->config = $config;
         $this->response = $response;
-        $this->queryBuilder = $queryBuilder;
         $this->cache = $cache;
         $this->umlGenerator = new \UniMapper\PlantUml\Generator;
     }
@@ -61,10 +57,8 @@ class Panel implements IBarPanel
     {
         $elapsed = [];
 
-        foreach ($this->queryBuilder->getCreated() as $query) {
-            if ($query->executed) {
-                $elapsed[] = $query->elapsed;
-            }
+        foreach (\UniMapper\Profiler::getResults() as $result) {
+            $elapsed[] = $result->elapsed;
         }
 
         return $elapsed;
@@ -106,7 +100,7 @@ class Panel implements IBarPanel
             if ($debug["count"]) {
 
                 ob_start();
-                include __DIR__ . "/panel/templates/queries.phtml";
+                include __DIR__ . "/panel/templates/results.phtml";
                 $debug["template"] = ob_get_clean();
             }
             $this->response->setHeader(self::HEADER_PREFIX, base64_encode(json_encode($debug)));

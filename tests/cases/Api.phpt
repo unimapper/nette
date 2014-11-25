@@ -48,7 +48,7 @@ class ApiTest extends Tester\TestCase
     {
         $this->inputMock->shouldReceive("getData")->once()->andReturn('{"text": "foo"}');
         $this->adapterMock->shouldReceive("createInsert")->once()->andReturn($this->adapterQueryMock);
-        $this->adapterMock->shouldReceive("execute")->once()->with($this->adapterQueryMock)->andReturn(1);
+        $this->adapterMock->shouldReceive("onExecute")->once()->with($this->adapterQueryMock)->andReturn(1);
 
         $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::POST, ["action" => "post"]);
         $response = $this->presenter->run($request);
@@ -99,8 +99,8 @@ class ApiTest extends Tester\TestCase
 
     public function testGetId()
     {
-        $this->adapterMock->shouldReceive("createFindOne")->once()->with("test_resource", "id", 1)->andReturn($this->adapterQueryMock);
-        $this->adapterMock->shouldReceive("execute")->once()->with($this->adapterQueryMock)->andReturn(["text" => "foo", "id" => 1]);
+        $this->adapterMock->shouldReceive("createSelectOne")->once()->with("test_resource", "id", 1)->andReturn($this->adapterQueryMock);
+        $this->adapterMock->shouldReceive("onExecute")->once()->with($this->adapterQueryMock)->andReturn(["text" => "foo", "id" => 1]);
 
         $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ['id' => 1, "action" => "get"]);
         $response = $this->presenter->run($request);
@@ -115,8 +115,8 @@ class ApiTest extends Tester\TestCase
 
     public function testGetIdNotFound()
     {
-        $this->adapterMock->shouldReceive("createFindOne")->once()->with()->andReturn($this->adapterQueryMock);
-        $this->adapterMock->shouldReceive("execute")->once()->with($this->adapterQueryMock)->andReturn(false);
+        $this->adapterMock->shouldReceive("createSelectOne")->once()->with()->andReturn($this->adapterQueryMock);
+        $this->adapterMock->shouldReceive("onExecute")->once()->with($this->adapterQueryMock)->andReturn(false);
 
         $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ['id' => 1, "action" => "get"]);
         Assert::type("Nette\Application\Responses\JsonResponse", $response = $this->presenter->run($request));
@@ -135,11 +135,11 @@ class ApiTest extends Tester\TestCase
 
     public function testGet()
     {
-        $this->adapterMock->shouldReceive("createFind")
+        $this->adapterMock->shouldReceive("createSelect")
             ->with("test_resource", ["id", "text"], [], 10, 0)
             ->once()
             ->andReturn($this->adapterQueryMock);
-        $this->adapterMock->shouldReceive("execute")
+        $this->adapterMock->shouldReceive("onExecute")
             ->with($this->adapterQueryMock)
             ->once()
             ->andReturn([["text" => "foo", "id" => 1], ["text" => "foo2", "id" => 2]]);
@@ -160,7 +160,7 @@ class ApiTest extends Tester\TestCase
     {
         $this->inputMock->shouldReceive("getData")->once()->andReturn('{"text": "foo"}');
         $this->adapterMock->shouldReceive("createUpdateOne")->with("test_resource", "id", 1, ["text" => "foo"])->once()->andReturn($this->adapterQueryMock);
-        $this->adapterMock->shouldReceive("execute")->with($this->adapterQueryMock)->once()->andReturn(true);
+        $this->adapterMock->shouldReceive("onExecute")->with($this->adapterQueryMock)->once()->andReturn(true);
 
         $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::PUT, ['id' => 1, "action" => "put"]);
         $response = $this->presenter->run($request);
@@ -177,7 +177,7 @@ class ApiTest extends Tester\TestCase
     public function testDelete()
     {
         $this->adapterMock->shouldReceive("createDeleteOne")->with("test_resource", "id", 1)->once()->andReturn($this->adapterQueryMock);
-        $this->adapterMock->shouldReceive("execute")->with($this->adapterQueryMock)->once()->andReturn(true);
+        $this->adapterMock->shouldReceive("onExecute")->with($this->adapterQueryMock)->once()->andReturn(true);
 
         $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::DELETE, ['id' => 1, "action" => "delete"]);
         $response = $this->presenter->run($request);

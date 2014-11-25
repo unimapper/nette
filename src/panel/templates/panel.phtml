@@ -57,14 +57,9 @@
         color: #fff;
     }
 </style>
-
 <h1>UniMapper</h1>
 <div class="nette-inner tracy-inner">
-    <div id="unimapper-panel-queries">
-        <?php include __DIR__ . '/queries.phtml' ?>
-    </div>
+    <div id="unimapper-panel-queries"><?php include __DIR__ . '/results.phtml' ?></div>
     <a href="#unimapper-panel-config" rel="#unimapper-panel-config" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed">Config</a>
-    <div id="unimapper-panel-config" class="tracy-collapsed nette-collapsed">
-        <?php include __DIR__ . '/config.phtml' ?>
-    </div>
+    <div id="unimapper-panel-config" class="tracy-collapsed nette-collapsed"><?php include __DIR__ . '/config.phtml' ?></div>
 </div>

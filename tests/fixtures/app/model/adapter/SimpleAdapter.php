@@ -2,7 +2,7 @@
 
 namespace UniMapper\Nette\Tests\Model\Adapter;
 
-class SimpleAdapter implements \UniMapper\Adapter\IAdapter
+class SimpleAdapter extends \UniMapper\Adapter
 {
 
     public function createCount($resource)
@@ -15,12 +15,12 @@ class SimpleAdapter implements \UniMapper\Adapter\IAdapter
         throw new \Exception("You should mock here!");
     }
 
-    public function createFindOne($resource, $primaryName, $primaryValue, array $associations = [])
+    public function createSelectOne($resource, $primaryName, $primaryValue, array $associations = [])
     {
         throw new \Exception("You should mock here!");
     }
 
-    public function createFind($resource, array $selection = [], array $orderBy = null, $limit = 0, $offset = 0, array $associations = [])
+    public function createSelect($resource, array $selection = [], array $orderBy = null, $limit = 0, $offset = 0, array $associations = [])
     {
         throw new \Exception("You should mock here!");
     }
@@ -45,7 +45,7 @@ class SimpleAdapter implements \UniMapper\Adapter\IAdapter
         throw new \Exception("You should mock here!");
     }
 
-    public function execute(\UniMapper\Adapter\IQuery $query)
+    public function onExecute(\UniMapper\Adapter\IQuery $query)
     {
         throw new \Exception("You should mock here!");
     }
