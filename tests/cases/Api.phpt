@@ -31,7 +31,6 @@ class ApiTest extends Tester\TestCase
 
         // Mock adapter
         $this->adapterMock = Mockery::mock("UniMapper\Nette\Tests\Model\Adapter\SimpleAdapter");
-        $this->adapterMock->shouldReceive("getMapper")->once()->andReturn(new UniMapper\Adapter\Mapper);
         $container->removeService("simpleAdapter");
         $container->addService("simpleAdapter", $this->adapterMock);
 

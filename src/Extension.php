@@ -38,7 +38,6 @@ class Extension extends CompilerExtension
             "enabled" => false,
             "module" => "Api"
         ],
-        "entityFactory" => "UniMapper\EntityFactory",
         "customQueries" => []
     ];
 
@@ -55,8 +54,11 @@ class Extension extends CompilerExtension
             $builder->addDefinition($this->prefix("cache"))->setClass("UniMapper\Nette\Cache");
         }
 
+        // Create mapper
+        $builder->addDefinition($this->prefix("mapper"))->setClass("UniMapper\Mapper");
+
         // Create entity factory
-        $builder->addDefinition($this->prefix("entityFactory"))->setClass($config["entityFactory"]);
+        $builder->addDefinition($this->prefix("entityFactory"))->setClass("UniMapper\EntityFactory");
 
         // Create query builder
         $builder->addDefinition($this->prefix("queryBuilder"))->setClass("UniMapper\QueryBuilder");

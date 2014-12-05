@@ -50,7 +50,6 @@ unimapper:
     customQueries:
         - CustomQueryClass
         - ...
-    entityFactory: YourCustomEntityFactory
 ```
 
 ## Api

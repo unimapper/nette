@@ -50,9 +50,4 @@ class SimpleAdapter extends \UniMapper\Adapter
         throw new \Exception("You should mock here!");
     }
 
-    public function getMapper()
-    {
-        throw new \Exception("You should mock here!");
-    }
-
 }
