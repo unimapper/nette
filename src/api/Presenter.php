@@ -130,7 +130,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             $this->data
         ); // @todo catch unsuccessfull convert
 
-        if (!$entity->getReflection()->hasPrimaryProperty()) {
+        if (!$entity->getReflection()->hasPrimary()) {
 
             $this->resource->success = false;
             $this->resource->code = 405;
@@ -172,7 +172,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             $this->data
         ); // @todo catch unsuccessfull convert
 
-        if (!$entity->getReflection()->hasPrimaryProperty()) {
+        if (!$entity->getReflection()->hasPrimary()) {
 
             $this->resource->success = false;
             $this->resource->code = 405;
