@@ -2,8 +2,7 @@
 
 namespace UniMapper\Nette;
 
-use UniMapper\QueryBuilder,
-    Nette\Diagnostics\Dumper,
+use Nette\Diagnostics\Dumper,
     Nette\Diagnostics\IBarPanel,
     Nette\Http\Response,
     Nette\Application as NA;
@@ -26,7 +25,7 @@ class Panel implements IBarPanel
     /** @var Response */
     private $response;
 
-    public function __construct(array $config, Response $response, QueryBuilder $queryBuilder, Cache $cache = null)
+    public function __construct(array $config, Response $response, Cache $cache = null)
     {
         $this->config = $config;
         $this->response = $response;

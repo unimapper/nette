@@ -4,8 +4,10 @@ namespace UniMapper\Nette\Api;
 
 use Nette\Application\Responses\JsonResponse,
     Nette\Http\Response,
-    Nette\Utils\Json,
-    UniMapper\Nette\Api\RepositoryList;
+    Nette\Utils\Json;
+use UniMapper\Reflection;
+use UniMapper\NamingConvention as UNC;
+use UniMapper\Nette\Api\RepositoryList;
 
 abstract class Presenter extends \Nette\Application\UI\Presenter
 {
@@ -30,19 +32,6 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     /** @var array $data Input data */
     protected $data;
-
-    /**  @var \UniMapper\EntityFactory $entityFactory */
-    protected $entityFactory;
-
-    /**
-     * Inject entity factory
-     *
-     * @param \UniMapper\EntityFactory $entityFactory
-     */
-    public function injectEntityFactory(\UniMapper\EntityFactory $entityFactory)
-    {
-        $this->entityFactory = $entityFactory;
-    }
 
     /**
      * Inject repositories
@@ -94,8 +83,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         if ($id) {
 
             // @todo catch unsuccessfull convert
-            $primaryValue = $this->entityFactory
-                ->getEntityReflection($this->repository->getEntityName())
+            $primaryValue = Reflection\Loader::load($this->repository->getEntityName())
                 ->getPrimaryProperty()
                 ->convertValue($id);
 
@@ -125,7 +113,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     {
         $this->beforePost();
 
-        $entity = $this->entityFactory->createEntity(
+        $entity = $this->_createEntity(
             $this->repository->getEntityName(),
             $this->data
         ); // @todo catch unsuccessfull convert
@@ -167,7 +155,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     {
         $this->beforePut();
 
-        $entity = $this->entityFactory->createEntity(
+        $entity = $this->_createEntity(
             $this->repository->getEntityName(),
             $this->data
         ); // @todo catch unsuccessfull convert
@@ -211,7 +199,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     {
         $this->beforeDelete();
 
-        $entity = $this->entityFactory->createEntity($this->repository->getEntityName());
+        $entity = $this->_createEntity($this->repository->getEntityName());
         $entity->{$entity->getReflection()->getPrimaryProperty()->getName()} = $id;  // @todo catch unsuccessfull convert
 
         $this->resource->success = (bool) $this->delete($entity);
@@ -299,6 +287,13 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     protected function afterPut(\UniMapper\Entity $entity)
     {
+
+    }
+
+    private function _createEntity($name, $values = [])
+    {
+        $class = UNC::nameToClass($name, UNC::$entityMask);
+        return new $class($values);
 
     }
 

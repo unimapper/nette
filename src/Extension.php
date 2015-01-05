@@ -2,7 +2,7 @@
 
 namespace UniMapper\Nette;
 
-use UniMapper\Exception\PropertyException,
+use UniMapper\Exception\EntityException,
     Nette\Diagnostics\Helpers,
     Nette\Diagnostics\BlueScreen,
     Nette\DI\CompilerExtension,
@@ -56,9 +56,6 @@ class Extension extends CompilerExtension
 
         // Create mapper
         $builder->addDefinition($this->prefix("mapper"))->setClass("UniMapper\Mapper");
-
-        // Create entity factory
-        $builder->addDefinition($this->prefix("entityFactory"))->setClass("UniMapper\EntityFactory");
 
         // Create query builder
         $builder->addDefinition($this->prefix("queryBuilder"))->setClass("UniMapper\QueryBuilder");
@@ -211,7 +208,7 @@ class Extension extends CompilerExtension
      */
     public static function renderException($exception)
     {
-        if ($exception instanceof PropertyException
+        if ($exception instanceof EntityException
             && $exception->getEntityPath() !== false
         ) {
             $link = Helpers::editorLink(
