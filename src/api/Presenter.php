@@ -292,7 +292,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     private function _createEntity($name, $values = [])
     {
-        $class = UNC::nameToClass($name, UNC::$entityMask);
+        $class = UNC::nameToClass($name, UNC::ENTITY_MASK);
         return new $class($values);
 
     }

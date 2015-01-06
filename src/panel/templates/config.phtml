@@ -20,11 +20,11 @@
         </tr>
         <tr>
             <td>Entity namespace</td>
-            <td><?php echo UNC::$entityMask ?></td>
+            <td><?php echo UNC::getMask(UNC::ENTITY_MASK) ?></td>
         </tr>
         <tr>
             <td>Repository namespace</td>
-            <td><?php echo UNC::$repositoryMask ?></td>
+            <td><?php echo UNC::getMask(UNC::REPOSITORY_MASK) ?></td>
         </tr>
         <?php if ($this->config["customQueries"]): ?>
         <tr>

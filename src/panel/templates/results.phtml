@@ -57,11 +57,11 @@ $elapsed = $this->_getElapsed(); ?>
                         <!-- result -->
                         <?php if ($captured->result instanceof \UniMapper\EntityCollection): ?>
                             <?php if (count($captured->result) === 0): ?>
-                                [0] <?php echo UNC::classToName($captured->result->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
+                                [0] <?php echo UNC::classToName($captured->result->getEntityReflection()->getClassName(), UNC::ENTITY_MASK) ?>
                             <?php else: ?>
                                 <span class="unimapper-panel-label"><?php echo count($captured->result) ?></span>
                                 <a href="#unimapper-panel-result-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>">
-                                    <?php echo UNC::classToName($captured->result->getEntityReflection()->getClassName(), UNC::$entityMask) ?>
+                                    <?php echo UNC::classToName($captured->result->getEntityReflection()->getClassName(), UNC::ENTITY_MASK) ?>
                                 </a>
                                 <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed tracy-collapsed">
                                     <?php foreach ($captured->result as $entity) { ?>
@@ -70,7 +70,7 @@ $elapsed = $this->_getElapsed(); ?>
                                 </div>
                             <?php endif ?>
                         <?php elseif ($captured->result instanceof \UniMapper\Entity): ?>
-                            <a href="#unimapper-panel-result-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index. $uid ?>"><?php echo UNC::classToName(get_class($captured->result), UNC::$entityMask) ?></a>
+                            <a href="#unimapper-panel-result-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index. $uid ?>"><?php echo UNC::classToName(get_class($captured->result), UNC::ENTITY_MASK) ?></a>
                             <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed tracy-collapsed">
                                 <?php echo $this->_getClickable($captured->result->toArray(true), true) ?>
                             </div>

@@ -176,13 +176,13 @@ class Extension extends CompilerExtension
         // Naming convention
         if ($config["namingConvention"]["entity"]) {
             $initialize->addBody(
-                'UniMapper\NamingConvention::$entityMask = ?;',
+                'UniMapper\NamingConvention::setMask(?, UniMapper\NamingConvention::ENTITY_MASK);',
                 [$config["namingConvention"]["entity"]]
             );
         }
         if ($config["namingConvention"]["repository"]) {
             $initialize->addBody(
-                'UniMapper\NamingConvention::$repositoryMask = ?;',
+                'UniMapper\NamingConvention::setMask(?, UniMapper\NamingConvention::REPOSITORY_MASK);',
                 [$config["namingConvention"]["repository"]]
             );
         }
