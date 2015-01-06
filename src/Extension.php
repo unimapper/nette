@@ -27,7 +27,10 @@ class Extension extends CompilerExtension
     /** @var array $defaults Default configuration */
     public $defaults = [
         "adapters" => [],
-        "panel" => true,
+        "panel" => [
+            "enabled" => true,
+            "ajax" => true
+        ],
         "profiler" => true,
         "cache" => true,
         "namingConvention" => [
@@ -75,7 +78,7 @@ class Extension extends CompilerExtension
         }
 
         // Debug mode
-        if ($builder->parameters["debugMode"] && $config["panel"]) {
+        if ($builder->parameters["debugMode"] && $config["panel"]["enabled"]) {
 
             // Create panel
             $builder->addDefinition($this->prefix("panel"))

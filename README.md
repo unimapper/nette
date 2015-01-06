@@ -45,7 +45,9 @@ unimapper:
     api:
         enabled: false
         module: "Api"
-    panel: true
+    panel:
+        enabled: true
+        ajax: true # log queries in AJAX requests
     profiler: true
     customQueries:
         - CustomQueryClass
