@@ -2,10 +2,10 @@
 
 namespace UniMapper\Nette\Tests\Model\Query;
 
-class Custom extends \UniMapper\Query\Custom
+class Custom extends \UniMapper\Query
 {
 
-    public function onExecute(\UniMapper\Adapter\IAdapter $adapter)
+    public function onExecute(\UniMapper\Connection $connection)
     {
         return "foo";
     }

@@ -1,6 +1,7 @@
 <?php
 
 use Tester\Assert;
+use UniMapper\Nette\Tests\Model\Entity;
 
 require __DIR__ . '/../bootstrap.php';
 
@@ -17,7 +18,7 @@ class ExtensionTest extends Tester\TestCase
 
     public function testCustomQueries()
     {
-        Assert::same("foo", $this->container->getService("unimapper.queryBuilder")->custom("Simple")->execute());
+        Assert::type("UniMapper\Nette\Tests\Model\Query\Custom", Entity\Simple::query()->custom());
     }
 
 }

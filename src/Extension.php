@@ -61,13 +61,7 @@ class Extension extends CompilerExtension
         $builder->addDefinition($this->prefix("mapper"))->setClass("UniMapper\Mapper");
 
         // Create query builder
-        $builder->addDefinition($this->prefix("queryBuilder"))->setClass("UniMapper\QueryBuilder");
-
-        foreach ($config["customQueries"] as $customQueryClass) {
-
-            $builder->getDefinition($this->prefix("queryBuilder"))
-                ->addSetup("registerQuery", array($customQueryClass));
-        }
+        $builder->addDefinition($this->prefix("connection"))->setClass("UniMapper\Connection");
 
         // Setup API
         if ($config["api"]["enabled"]) {
@@ -106,15 +100,9 @@ class Extension extends CompilerExtension
                     ->addSetup('$service->afterExecute(array(?, "adapterCallback"))', array(get_class()));
             }
 
-            // Register adapters on query builder
-            $builder->getDefinition($this->prefix("queryBuilder"))
+            // Register adapters
+            $builder->getDefinition($this->prefix("connection"))
                 ->addSetup("registerAdapter", array($adapterName, $adapterService));
-        }
-
-        if ($config["profiler"]) {
-            $builder->getDefinition($this->prefix("queryBuilder"))
-                ->addSetup('$service->beforeQuery(array(?, "beforeQueryCallback"))', array(get_class()))
-                ->addSetup('$service->afterQuery(array(?, "afterQueryCallback"))', array(get_class()));
         }
 
         // Back compatibility
@@ -188,6 +176,19 @@ class Extension extends CompilerExtension
                 'UniMapper\NamingConvention::setMask(?, UniMapper\NamingConvention::REPOSITORY_MASK);',
                 [$config["namingConvention"]["repository"]]
             );
+        }
+
+        // Register custom queries
+        if (is_array($config["customQueries"])) {
+            foreach ($config["customQueries"] as $class) {
+                $initialize->addBody('UniMapper\QueryBuilder::registerQuery(?);', array($class));
+            }
+        }
+
+        // Set profiler
+        if ($config["profiler"]) {
+            $initialize->addBody('UniMapper\QueryBuilder::beforeRun(array(?, "beforeQueryCallback"));', array(get_class()));
+            $initialize->addBody('UniMapper\QueryBuilder::afterRun(array(?, "afterQueryCallback"));', array(get_class()));
         }
     }
 
