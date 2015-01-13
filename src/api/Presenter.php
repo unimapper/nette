@@ -262,7 +262,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     protected function delete(\UniMapper\Entity $entity)
     {
-        return $this->repository->delete($entity);
+        return $this->repository->destroy($entity);
     }
 
     protected function post(\UniMapper\Entity $entity)

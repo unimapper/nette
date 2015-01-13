@@ -40,7 +40,7 @@ class SimpleAdapter extends \UniMapper\Adapter
         throw new \Exception("You should mock here!");
     }
 
-    public function createModifyManyToMany(\UniMapper\Reflection\Association\ManyToMany $association, $primaryValue, array $keys, $action = self::ASSOC_ADD)
+    public function createModifyManyToMany(\UniMapper\Association\ManyToMany $association, $primaryValue, array $keys, $action = self::ASSOC_ADD)
     {
         throw new \Exception("You should mock here!");
     }
