@@ -2,13 +2,12 @@
 
 namespace UniMapper\Nette;
 
-use UniMapper\Exception\EntityException,
-    Nette\Diagnostics\Helpers,
-    Nette\Diagnostics\BlueScreen,
-    Nette\DI\CompilerExtension,
-    Nette\PhpGenerator\ClassType,
-    Nette\DI\Compiler,
-    Nette\Configurator;
+use Nette\Configurator;
+use Nette\Diagnostics\BlueScreen;
+use Nette\Diagnostics\Helpers;
+use Nette\DI\Compiler;
+use Nette\DI\CompilerExtension;
+use Nette\PhpGenerator\ClassType;
 
 // Nette 2.0 back compatibility
 if (!class_exists('Nette\DI\CompilerExtension')) {
@@ -212,7 +211,7 @@ class Extension extends CompilerExtension
      */
     public static function renderException($exception)
     {
-        if ($exception instanceof EntityException
+        if ($exception instanceof \UniMapper\Exception\EntityException
             && $exception->getEntityPath() !== false
         ) {
             $link = Helpers::editorLink(
@@ -226,6 +225,13 @@ class Extension extends CompilerExtension
             return [
                 "tab" => "Entity",
                 "panel" =>  $link . "\n" . $code
+            ];
+        } elseif ($exception instanceof \UniMapper\Exception\InvalidArgumentException
+            && $exception->getValue() !== null
+        ) {
+            return [
+                "tab" => "Value given",
+                "panel" => self::dump($exception->getValue())
             ];
         }
     }
@@ -243,6 +249,19 @@ class Extension extends CompilerExtension
     public static function afterQueryCallback(\UniMapper\Query $query, $result, $elapsed)
     {
         \UniMapper\Profiler::endQuery($result, $elapsed);
+    }
+
+    public static function dump($variable, $collapsed = false)
+    {
+        if (class_exists('Nette\Diagnostics\Dumper')) {
+            return \Nette\Diagnostics\Dumper::toHtml(
+                $variable,
+                [\Nette\Diagnostics\Dumper::COLLAPSE => $collapsed]
+            );
+        }
+
+        // Nette 2.0 back compatibility
+        return \Nette\Diagnostics\Helpers::clickableDump($variable, $collapsed);
     }
 
 }

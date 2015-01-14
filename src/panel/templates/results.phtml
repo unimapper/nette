@@ -65,17 +65,17 @@ $elapsed = $this->_getElapsed(); ?>
                                 </a>
                                 <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed tracy-collapsed">
                                     <?php foreach ($captured->result as $entity) { ?>
-                                        <?php echo $this->_getClickable($entity->toArray(true), true) ?>
+                                        <?php echo UniMapper\Nette\Extension::dump($entity->toArray(true), true) ?>
                                     <?php } ?>
                                 </div>
                             <?php endif ?>
                         <?php elseif ($captured->result instanceof \UniMapper\Entity): ?>
                             <a href="#unimapper-panel-result-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index. $uid ?>"><?php echo UNC::classToName(get_class($captured->result), UNC::ENTITY_MASK) ?></a>
                             <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed tracy-collapsed">
-                                <?php echo $this->_getClickable($captured->result->toArray(true), true) ?>
+                                <?php echo UniMapper\Nette\Extension::dump($captured->result->toArray(true), true) ?>
                             </div>
                         <?php else: ?>
-                            <?php echo $this->_getClickable($captured->result, true) ?>
+                            <?php echo UniMapper\Nette\Extension::dump($captured->result, true) ?>
                         <?php endif ?>
                     <?php endif ?>
                 </td>

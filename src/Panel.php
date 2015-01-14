@@ -2,10 +2,9 @@
 
 namespace UniMapper\Nette;
 
-use Nette\Diagnostics\Dumper,
-    Nette\Diagnostics\IBarPanel,
-    Nette\Http\Response,
-    Nette\Application as NA;
+use Nette\Application as NA;
+use Nette\Diagnostics\IBarPanel;
+use Nette\Http\Response;
 
 class Panel implements IBarPanel
 {
@@ -31,16 +30,6 @@ class Panel implements IBarPanel
         $this->response = $response;
         $this->cache = $cache;
         $this->umlGenerator = new \UniMapper\PlantUml\Generator;
-    }
-
-    private function _getClickable($variable, $collapsed = false)
-    {
-        if (class_exists('Nette\Diagnostics\Dumper')) {
-            return Dumper::toHtml($variable, [Dumper::COLLAPSE => $collapsed]);
-        }
-
-        // Nette 2.0 back compatibility
-        return \Nette\Diagnostics\Helpers::clickableDump($variable, $collapsed);
     }
 
     private function _getQueryLevel(array $elapsed, $time)
