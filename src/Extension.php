@@ -233,6 +233,13 @@ class Extension extends CompilerExtension
                 "tab" => "Value given",
                 "panel" => self::dump($exception->getValue())
             ];
+        } elseif ($exception instanceof \UniMapper\Exception\AdapterException
+            && $exception->getQuery() !== null
+        ) {
+            return [
+                "tab" => "Query",
+                "panel" => self::dump($exception->getQuery())
+            ];
         }
     }
 
