@@ -5,7 +5,7 @@ use Tester\Assert;
 require __DIR__ . '/../bootstrap.php';
 
 /**
- * @httpCode 404
+ * @httpCode 400
  */
 class ApiTest extends Tester\TestCase
 {
@@ -171,6 +171,19 @@ class ApiTest extends Tester\TestCase
         Assert::true($payload->success);
         Assert::same('/api/simple/1', $payload->link);
         Assert::same(['id' => 1, 'text' => "foo"], $payload->body);
+    }
+
+    public function testPutNoPrimary()
+    {
+        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::PUT, ["action" => "put"]);
+        $response = $this->presenter->run($request);
+        Assert::type("Nette\Application\Responses\JsonResponse", $response);
+        Assert::same("application/json", $response->getContentType());
+
+        $payload = $response->getPayload();
+        Assert::type("UniMapper\Nette\Api\Resource", $payload);
+        Assert::false($payload->success);
+        Assert::same(["Primary value required!"], $payload->messages);
     }
 
     public function testDelete()

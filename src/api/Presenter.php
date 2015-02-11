@@ -153,6 +153,14 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     public function actionPut($id)
     {
+        if (empty($id)) {
+
+            $this->resource->success = false;
+            $this->resource->code = 400;
+            $this->resource->messages[] = "Primary value required!";
+            return;
+        }
+
         $this->beforePut();
 
         $entity = $this->_createEntity(
