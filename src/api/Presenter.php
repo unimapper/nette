@@ -18,9 +18,6 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     /** @var \UniMapper\Nette\Api\RepositoryList $repositories */
     private $repositories;
 
-    /** @var \Nette\Http\Response $httpResponse */
-    private $httpResponse;
-
     /** @var integer $maxLimit */
     protected $maxLimit = 10;
 
@@ -41,16 +38,6 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     public function injectRepositories(RepositoryList $repositories)
     {
         $this->repositories = $repositories;
-    }
-
-    /**
-     * Inject HTTP response
-     *
-     * @param \Nette\Http\Response $httpResponse
-     */
-    public function injectHttpResponse(Response $httpResponse)
-    {
-        $this->httpResponse = $httpResponse;
     }
 
     /**
@@ -211,7 +198,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     {
         parent::beforeRender();
         if ($this->resource->code) {
-            $this->httpResponse->setCode($this->resource->code);
+            $this->getHttpResponse()->setCode($this->resource->code);
         }
         $this->sendJsonData($this->resource);
     }
