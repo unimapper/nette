@@ -31,7 +31,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     private $input;
 
     /** @var array $data Input data */
-    protected $data;
+    protected $data = [];
 
     /**
      * Inject repositories
@@ -75,7 +75,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         }
 
         $this->repository = $this->repositories[$name];
-        $this->data = Json::decode($this->input->getData(), Json::FORCE_ARRAY);
+        $this->data = (array) Json::decode($this->input->getData(), Json::FORCE_ARRAY);
     }
 
     public function actionGet($id = null, array $associate = [])
@@ -111,14 +111,9 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     public function actionPost()
     {
-        $this->beforePost();
+        $inputEntity = $this->beforePost($this->data);
 
-        $entity = $this->_createEntity(
-            $this->repository->getEntityName(),
-            $this->data
-        ); // @todo catch unsuccessfull convert
-
-        if (!$entity->getReflection()->hasPrimary()) {
+        if (!$inputEntity->getReflection()->hasPrimary()) {
 
             $this->resource->success = false;
             $this->resource->code = 405;
@@ -128,13 +123,13 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
         try {
 
-            $this->post($entity);
+            $resultEntity = $this->post($inputEntity);
 
             $this->resource->code = 201;
             $this->resource->success = true;
-            $this->resource->link = $this->link("get", $entity->{$entity->getReflection()->getPrimaryProperty()->getName()});
-            $this->resource->body = $entity->toArray(true);
-        } catch (\Exception $e) {
+            $this->resource->link = $this->link("get", $resultEntity->{$inputEntity->getReflection()->getPrimaryProperty()->getName()});
+            $this->resource->body = $inputEntity->toArray(true);
+        } catch (\UniMapper\Exception $e) {
 
             if ($e instanceof \UniMapper\Exception\ValidatorException) {
                 $this->resource->messages = $e->getValidator()->getMessages();
@@ -146,9 +141,10 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
             $this->resource->code = 400;
             $this->resource->success = false;
+            return;
         }
 
-        $this->afterPost($entity);
+        $this->afterPost($resultEntity);
     }
 
     public function actionPut($id)
@@ -161,14 +157,9 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             return;
         }
 
-        $this->beforePut();
+        $inputEntity = $this->beforePut($this->data);
 
-        $entity = $this->_createEntity(
-            $this->repository->getEntityName(),
-            $this->data
-        ); // @todo catch unsuccessfull convert
-
-        if (!$entity->getReflection()->hasPrimary()) {
+        if (!$inputEntity->getReflection()->hasPrimary()) {
 
             $this->resource->success = false;
             $this->resource->code = 405;
@@ -176,17 +167,17 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             return;
         }
 
-        $primaryProperty = $entity->getReflection()->getPrimaryProperty();
-        $entity->{$primaryProperty->getName()} = $primaryProperty->convertValue($id); // @todo catch unsuccessfull convert
+        $primaryProperty = $inputEntity->getReflection()->getPrimaryProperty();
+        $inputEntity->{$primaryProperty->getName()} = $primaryProperty->convertValue($id); // @todo catch unsuccessfull convert
 
         try {
 
-            $this->put($entity);
+            $resultEntity = $this->put($inputEntity);
 
             $this->resource->success = true;
-            $this->resource->link = $this->link("get", $entity->{$primaryProperty->getName()});
-            $this->resource->body = $entity->toArray(true);
-        } catch (\Exception $e) {
+            $this->resource->link = $this->link("get", $resultEntity->{$primaryProperty->getName()});
+            $this->resource->body = $inputEntity->toArray(true);
+        } catch (\UniMapper\Exception $e) {
 
             if ($e instanceof \UniMapper\Exception\ValidatorException) {
                 $this->resource->messages = $e->getValidator()->getMessages();
@@ -198,9 +189,10 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
             $this->resource->code = 400;
             $this->resource->success = false;
+            return;
         }
 
-        $this->afterPut($entity);
+        $this->afterPut($resultEntity);
     }
 
     public function actionDelete($id)
@@ -258,14 +250,28 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     }
 
-    protected function beforePost()
+    /**
+     * @todo catch unsuccessfull conversion
+     *
+     * @param array $data Input data
+     *
+     * @return \UniMapper\Entity
+     */
+    protected function beforePost(array $data)
     {
-
+        return $this->_createEntity($this->repository->getEntityName(), $data);
     }
 
-    protected function beforePut()
+    /**
+     * @todo catch unsuccessfull conversion
+     *
+     * @param array $data Input data
+     *
+     * @return \UniMapper\Entity
+     */
+    protected function beforePut(array $data)
     {
-
+        return $this->_createEntity($this->repository->getEntityName(), $data);
     }
 
     protected function delete(\UniMapper\Entity $entity)
@@ -276,11 +282,13 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
     protected function post(\UniMapper\Entity $entity)
     {
         $this->repository->save($entity);
+        return $entity;
     }
 
     protected function put(\UniMapper\Entity $entity)
     {
         $this->repository->save($entity);
+        return $entity;
     }
 
     protected function afterDelete(\UniMapper\Entity $entity)
@@ -298,11 +306,10 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     }
 
-    private function _createEntity($name, $values = [])
+    private function _createEntity($name, array $values = [])
     {
         $class = UNC::nameToClass($name, UNC::ENTITY_MASK);
         return new $class($values);
-
     }
 
 }
