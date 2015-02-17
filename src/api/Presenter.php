@@ -2,9 +2,8 @@
 
 namespace UniMapper\Nette\Api;
 
-use Nette\Application\Responses\JsonResponse,
-    Nette\Http\Response,
-    Nette\Utils\Json;
+use Nette\Application\Responses\JsonResponse;
+use Nette\Utils\Json;
 use UniMapper\Reflection;
 use UniMapper\NamingConvention as UNC;
 use UniMapper\Nette\Api\RepositoryList;
