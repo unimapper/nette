@@ -14,9 +14,6 @@ unimapper:
         enabled: true
     customQueries:
         - UniMapper\Nette\Tests\Model\Query\Custom
-    adapters:
-        SimpleAdapter: @simpleAdapter
 
 services:
     simpleRepository: UniMapper\Nette\Tests\Model\Repository\SimpleRepository
-    simpleAdapter: UniMapper\Nette\Tests\Model\Adapter\SimpleAdapter

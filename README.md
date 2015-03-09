@@ -69,13 +69,23 @@ class EntityPresenter extends \UniMapper\Nette\Api\Presenter
 ```
 
 Now you can call standard API methods like:
-- GET  /api/entity   - for all records
-- GET  /api/entity/1 - for a single record
-- PUT  /api/entity/1 - update record with JSON data stored in request
-- POST /api/entity   - create new record with JSON data stored in request
+### GET /api/entity
+Get all records with following optional parameters:
+- where: [filter](http://unimapper.github.io/docs/reference/repository/#filtering-data) in valid JSON format
+- associate: array associations to join, syntax should look like `?associate[]=property1&associate[]=property2`
+
+### GET /api/entity/1
+Get a single record with following optional parameters:
+- associate: array associations to join, syntax should look like `?associate[]=property1&associate[]=property2`
+
+### PUT /api/entity/1
+Update record with JSON data stored in request body.
+
+### POST /api/entity
+Create a new record with JSON data stored in request body.
 
 ### Custom API methods
-You can eve define you custom method.
+You can even define your custom method.
 
 Example:
 ```php

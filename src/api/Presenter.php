@@ -64,7 +64,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         $this->data = (array) Json::decode($this->input->getData(), Json::FORCE_ARRAY);
     }
 
-    public function actionGet($id = null, array $associate = [])
+    public function actionGet($id = null, array $associate = [], $where = null)
     {
         if ($id) {
 
@@ -85,13 +85,35 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             $this->resource->body = $entity;
         } else {
 
-            $this->resource->body = $this->repository->find(
-                [],
-                [],
-                $this->getLimit(),
-                $this->getOffset(),
-                $associate
-            );
+            if ($where) {
+
+                try {
+                    $filter = Json::decode($where, Json::FORCE_ARRAY);
+                } catch (\Nette\Utils\JsonException $e) {
+
+                    $this->resource->messages[] = "Invalid where parameter. Must be a valid JSON but '" . $where . "' given!";
+                    $this->resource->code = 400;
+                    return;
+                }
+            } else {
+                $filter = [];
+            }
+
+            try {
+
+                $this->resource->body = $this->repository->find(
+                    $filter,
+                    [],
+                    $this->getLimit(),
+                    $this->getOffset(),
+                    $associate
+                );
+            } catch (\UniMapper\Exception\RepositoryException $e) {
+
+                $this->resource->messages[] = $e->getMessage();
+                $this->resource->code = 400;
+                return;
+            }
         }
     }
 
@@ -114,7 +136,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             $this->resource->code = 201;
             $this->resource->success = true;
             $this->resource->link = $this->link("get", $resultEntity->{$inputEntity->getReflection()->getPrimaryProperty()->getName()});
-            $this->resource->body = $inputEntity->toArray(true);
+            $this->resource->body = $resultEntity->toArray(true);
         } catch (\UniMapper\Exception $e) {
 
             if ($e instanceof \UniMapper\Exception\ValidatorException) {
@@ -267,14 +289,12 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     protected function post(\UniMapper\Entity $entity)
     {
-        $this->repository->save($entity);
-        return $entity;
+        return $this->repository->save($entity);
     }
 
     protected function put(\UniMapper\Entity $entity)
     {
-        $this->repository->save($entity);
-        return $entity;
+        return $this->repository->save($entity);
     }
 
     protected function afterDelete(\UniMapper\Entity $entity)
