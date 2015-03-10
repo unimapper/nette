@@ -71,12 +71,12 @@ class EntityPresenter extends \UniMapper\Nette\Api\Presenter
 Now you can call standard API methods like:
 ### GET /api/entity
 Get all records with following optional parameters:
-- where: [filter](http://unimapper.github.io/docs/reference/repository/#filtering-data) in valid JSON format
-- associate: array associations to join, syntax should look like `?associate[]=property1&associate[]=property2`
+- **where** [filter](http://unimapper.github.io/docs/reference/repository/#filtering-data) in valid JSON format
+- **associate** list of associations to join as `array`, syntax should look like `?associate[]=property1&associate[]=property2`
 
 ### GET /api/entity/1
 Get a single record with following optional parameters:
-- associate: array associations to join, syntax should look like `?associate[]=property1&associate[]=property2`
+- **associate** list of associations to join as `array`, syntax should look like `?associate[]=property1&associate[]=property2`
 
 ### PUT /api/entity/1
 Update record with JSON data stored in request body.
