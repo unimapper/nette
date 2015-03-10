@@ -22,6 +22,6 @@
         "squizlabs/php_codesniffer": "~2.0"
     },
     "autoload": {
-        "classmap": ["src/"]
+         "psr-4": {"UniMapper\\Nette\\": "src/"}
     }
 }

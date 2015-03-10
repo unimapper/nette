@@ -5,6 +5,9 @@ use UniMapper\Nette\Tests\Model\Entity;
 
 require __DIR__ . '/../bootstrap.php';
 
+/**
+ * @testCase
+ */
 class ExtensionTest extends Tester\TestCase
 {
 
