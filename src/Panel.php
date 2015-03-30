@@ -10,26 +10,17 @@ class Panel implements IBarPanel
 {
 
     const HEADER_PREFIX = "UniMapper-Nette";
-    const UML_CACHE_KEY = "uml.schema";
-
-    /** @var \UniMapper\PlantUml\Genarator */
-    private $umlGenerator;
 
     /** @var array */
     private $config;
 
-    /** @var Cache */
-    private $cache;
-
     /** @var Response */
     private $response;
 
-    public function __construct(array $config, Response $response, Cache $cache = null)
+    public function __construct(array $config, Response $response)
     {
         $this->config = $config;
         $this->response = $response;
-        $this->cache = $cache;
-        $this->umlGenerator = new \UniMapper\PlantUml\Generator;
     }
 
     private function _getQueryLevel(array $elapsed, $time)
@@ -63,18 +54,6 @@ class Panel implements IBarPanel
 
     public function getPanel()
     {
-        if ($this->cache) {
-
-            $umlUrl = $this->cache->load(self::UML_CACHE_KEY);
-            if (!$umlUrl) {
-
-                $umlUrl = $this->_generateUmlUrl();
-                $this->cache->save(self::UML_CACHE_KEY, $umlUrl, []);
-            }
-        } else {
-            $umlUrl = $this->_generateUmlUrl();
-        }
-
         ob_start();
         include __DIR__ . "/panel/templates/panel.phtml";
         return ob_get_clean();
@@ -93,12 +72,6 @@ class Panel implements IBarPanel
             }
             $this->response->setHeader(self::HEADER_PREFIX, base64_encode(json_encode($debug)));
         }
-    }
-
-    private function _generateUmlUrl()
-    {
-        return "http://www.plantuml.com/plantuml/img/"
-            . $this->umlGenerator->getUrlCode($this->umlGenerator->generate());
     }
 
 }

@@ -11,8 +11,7 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "bauer01/unimapper-plantuml": "dev-master"
+        "php": ">=5.4.0"
     },
     "require-dev": {
         "nette/tester": "~1.3.0",
