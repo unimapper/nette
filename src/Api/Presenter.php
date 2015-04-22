@@ -64,8 +64,16 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         $this->data = (array) Json::decode($this->input->getData(), Json::FORCE_ARRAY);
     }
 
-    public function actionGet($id = null, array $associate = [], $where = null)
+    public function actionGet($id = null, $associate = null, $where = null)
     {
+        if ($associate) {
+            if (is_string($associate)) {
+                $associate = explode(',', $associate);
+            }
+        } else {
+            $associate = [];
+        }
+
         if ($id) {
 
             // @todo catch unsuccessfull convert
