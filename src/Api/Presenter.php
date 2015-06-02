@@ -64,7 +64,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         $this->data = (array) Json::decode($this->input->getData(), Json::FORCE_ARRAY);
     }
 
-    public function actionGet($id = null, $associate = null, $where = null)
+    public function actionGet($id = null, $associate = null, $where = null, $count = false)
     {
         if ($associate) {
             if (is_string($associate)) {
@@ -76,12 +76,19 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
         if ($id) {
 
-            // @todo catch unsuccessfull convert
-            $primaryValue = Reflection\Loader::load($this->repository->getEntityName())
-                ->getPrimaryProperty()
-                ->convertValue($id);
+            $reflection = Reflection\Loader::load($this->repository->getEntityName());
+            if (!$reflection->hasPrimary()) {
 
-            $entity = $this->repository->findOne($primaryValue, $associate);
+                $this->resource->success = false;
+                $this->resource->code = 405;
+                $this->resource->messages[] = "Method is not allowed on entities without primary property!";
+                return;
+            }
+
+            $entity = $this->repository->findOne(
+                $reflection->getPrimaryProperty()->convertValue($id),
+                $associate
+            );
 
             if (!$entity) {
 
@@ -109,7 +116,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
             try {
 
-                $this->resource->body = $this->repository->find(
+                $this->resource->body = $count ? $this->repository->count($filter) : $this->repository->find(
                     $filter,
                     [],
                     $this->getLimit(),
@@ -127,15 +134,17 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     public function actionPost()
     {
-        $inputEntity = $this->beforePost($this->data);
+        $reflection = Reflection\Loader::load($this->repository->getEntityName());
 
-        if (!$inputEntity->getReflection()->hasPrimary()) {
+        if (!$reflection->hasPrimary()) {
 
             $this->resource->success = false;
             $this->resource->code = 405;
             $this->resource->messages[] = "Method is not allowed on entities without primary property!";
             return;
         }
+
+        $inputEntity = $reflection->createEntity($this->data); // @todo catch unsuccessfull conversion
 
         try {
 
@@ -143,8 +152,8 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
             $this->resource->code = 201;
             $this->resource->success = true;
-            $this->resource->link = $this->link("get", $resultEntity->{$inputEntity->getReflection()->getPrimaryProperty()->getName()});
-            $this->resource->body = $resultEntity->toArray(true);
+            $this->resource->link = $this->link("get", $resultEntity->{$reflection->getPrimaryProperty()->getName()});
+            $this->resource->body = $resultEntity->{$reflection->getPrimaryProperty()->getName()};
         } catch (\UniMapper\Exception $e) {
 
             if ($e instanceof \UniMapper\Exception\ValidatorException) {
@@ -160,67 +169,106 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             return;
         }
 
-        $this->afterPost($resultEntity);
+        return $resultEntity;
     }
 
-    public function actionPut($id)
+    public function actionPut($id = null, $where = null)
     {
-        if (empty($id)) {
+        $reflection = Reflection\Loader::load($this->repository->getEntityName());
 
-            $this->resource->success = false;
-            $this->resource->code = 400;
-            $this->resource->messages[] = "Primary value required!";
-            return;
-        }
+        $entity = $reflection->createEntity($this->data); // @todo catch unsuccessfull convert
 
-        $inputEntity = $this->beforePut($this->data);
+        if ($id) {
 
-        if (!$inputEntity->getReflection()->hasPrimary()) {
+            if (!$reflection->hasPrimary()) {
 
-            $this->resource->success = false;
-            $this->resource->code = 405;
-            $this->resource->messages[] = "Method is not allowed on entities without primary property!";
-            return;
-        }
-
-        $primaryProperty = $inputEntity->getReflection()->getPrimaryProperty();
-        $inputEntity->{$primaryProperty->getName()} = $primaryProperty->convertValue($id); // @todo catch unsuccessfull convert
-
-        try {
-
-            $resultEntity = $this->put($inputEntity);
-
-            $this->resource->success = true;
-            $this->resource->link = $this->link("get", $resultEntity->{$primaryProperty->getName()});
-            $this->resource->body = $inputEntity->toArray(true);
-        } catch (\UniMapper\Exception $e) {
-
-            if ($e instanceof \UniMapper\Exception\ValidatorException) {
-                $this->resource->messages = $e->getValidator()->getMessages();
-            } elseif ($e instanceof \UniMapper\Exception\RepositoryException) {
-                $this->resource->messages[] = $e->getMessage();
-            } else {
-                throw $e;
+                $this->resource->success = false;
+                $this->resource->code = 405;
+                $this->resource->messages[] = "Method is not allowed on entities without primary property!";
+                return;
             }
 
-            $this->resource->code = 400;
-            $this->resource->success = false;
-            return;
+            $entity->{$reflection->getPrimaryProperty()->getName()} = $reflection->getPrimaryProperty()->convertValue($id); // @todo catch unsuccessfull convert
+
+            try {
+
+                $this->putOne($entity);
+
+                $this->resource->link = $this->link("get", $id);
+                $this->resource->body = $entity;
+            } catch (\UniMapper\Exception $e) {
+
+                if ($e instanceof \UniMapper\Exception\ValidatorException) {
+                    $this->resource->messages = $e->getValidator()->getMessages();
+                } elseif ($e instanceof \UniMapper\Exception\RepositoryException) {
+                    $this->resource->messages[] = $e->getMessage();
+                } else {
+                    throw $e;
+                }
+
+                $this->resource->code = 400;
+                $this->resource->success = false;
+                return;
+            }
+        } else {
+
+            if ($where) {
+
+                try {
+                    $filter = Json::decode($where, Json::FORCE_ARRAY);
+                } catch (\Nette\Utils\JsonException $e) {
+
+                    $this->resource->messages[] = "Invalid where parameter. Must be a valid JSON but '" . $where . "' given!";
+                    $this->resource->code = 400;
+                    return;
+                }
+            } else {
+                $filter = [];
+            }
+
+            $this->resource->body = $this->put($entity, $filter);
         }
 
-        $this->afterPut($resultEntity);
+        $this->resource->success = true;
     }
 
-    public function actionDelete($id)
+    public function actionDelete($id = null, $where = null)
     {
-        $this->beforeDelete();
+        if ($id) {
+            // Delete one
 
-        $entity = $this->_createEntity($this->repository->getEntityName());
-        $entity->{$entity->getReflection()->getPrimaryProperty()->getName()} = $id;  // @todo catch unsuccessfull convert
+            $reflection = Reflection\Loader::load($this->repository->getEntityName());
+            if (!$reflection->hasPrimary()) {
 
-        $this->resource->success = (bool) $this->delete($entity);
+                $this->resource->success = false;
+                $this->resource->code = 405;
+                $this->resource->messages[] = "Method is not allowed on entities without primary property!";
+                return;
+            }
+            $this->resource->success = (bool) $this->deleteOne(
+                $reflection->createEntity(
+                    [$reflection->getPrimaryProperty()->getName() => $id]
+                )
+            );
+        } else {
+            // Delete
 
-        $this->afterDelete($entity);
+            if ($where) {
+
+                try {
+                    $filter = Json::decode($where, Json::FORCE_ARRAY);
+                } catch (\Nette\Utils\JsonException $e) {
+
+                    $this->resource->messages[] = "Invalid where parameter. Must be a valid JSON but '" . $where . "' given!";
+                    $this->resource->code = 400;
+                    return;
+                }
+            } else {
+                $filter = [];
+            }
+
+            $this->resource->body = $this->delete($filter);
+        }
     }
 
     public function beforeRender()
@@ -261,38 +309,14 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         return (int) $this->getParameter("offset");
     }
 
-    protected function beforeDelete()
-    {
-
-    }
-
-    /**
-     * @todo catch unsuccessfull conversion
-     *
-     * @param array $data Input data
-     *
-     * @return \UniMapper\Entity
-     */
-    protected function beforePost(array $data)
-    {
-        return $this->_createEntity($this->repository->getEntityName(), $data);
-    }
-
-    /**
-     * @todo catch unsuccessfull conversion
-     *
-     * @param array $data Input data
-     *
-     * @return \UniMapper\Entity
-     */
-    protected function beforePut(array $data)
-    {
-        return $this->_createEntity($this->repository->getEntityName(), $data);
-    }
-
-    protected function delete(\UniMapper\Entity $entity)
+    protected function deleteOne(\UniMapper\Entity $entity)
     {
         return $this->repository->destroy($entity);
+    }
+
+    protected function delete(array $where = [])
+    {
+        return $this->repository->destroyBy($where);
     }
 
     protected function post(\UniMapper\Entity $entity)
@@ -300,30 +324,14 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         return $this->repository->save($entity);
     }
 
-    protected function put(\UniMapper\Entity $entity)
+    protected function put(\UniMapper\Entity $entity, array $filter = [])
+    {
+        return $this->repository->updateBy($entity, $filter);
+    }
+
+    protected function putOne(\UniMapper\Entity $entity)
     {
         return $this->repository->save($entity);
-    }
-
-    protected function afterDelete(\UniMapper\Entity $entity)
-    {
-
-    }
-
-    protected function afterPost(\UniMapper\Entity $entity)
-    {
-
-    }
-
-    protected function afterPut(\UniMapper\Entity $entity)
-    {
-
-    }
-
-    private function _createEntity($name, array $values = [])
-    {
-        $class = UNC::nameToClass($name, UNC::ENTITY_MASK);
-        return new $class($values);
     }
 
 }

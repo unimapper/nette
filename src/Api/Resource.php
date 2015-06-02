@@ -9,6 +9,7 @@ class Resource extends \Nette\Object implements \JsonSerializable
     public $link;
     public $code;
     public $body = [];
+    public $count;
     public $messages = [];
 
     public function jsonSerialize()
@@ -22,6 +23,9 @@ class Resource extends \Nette\Object implements \JsonSerializable
         }
         if ($this->messages) {
             $data["messages"] = $this->messages;
+        }
+        if ($this->count !== null) {
+            $data["count"] = $this->count;
         }
         return $data;
     }

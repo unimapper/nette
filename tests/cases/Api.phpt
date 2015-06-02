@@ -58,7 +58,7 @@ class ApiTest extends Tester\TestCase
         Assert::type("UniMapper\Nette\Api\Resource", $payload);
         Assert::true($payload->success);
         Assert::same('/api/simple/1', $payload->link);
-        Assert::same(['id' => $savedEntity->id, 'text' => $savedEntity->text], $payload->body);
+        Assert::same($savedEntity->id, $payload->body);
     }
 
     public function testPostWithFailedValidation()
@@ -129,6 +129,7 @@ class ApiTest extends Tester\TestCase
                 'link' => NULL,
                 'code' => 404,
                 'body' => array(),
+                'count' => null,
                 'messages' => array('Record not found!'),
             ),
             (array) $response->getPayload()
@@ -157,6 +158,21 @@ class ApiTest extends Tester\TestCase
         Assert::same("foo2", $response->getPayload()->body[1]->text);
         Assert::same(1, $response->getPayload()->body[0]->id);
         Assert::same(2, $response->getPayload()->body[1]->id);
+    }
+
+    public function testGetCount()
+    {
+        $this->inputMock->shouldReceive("getData")->once();
+        $this->repositoryMock->shouldReceive("count")
+            ->with([])
+            ->once()
+            ->andReturn(3);
+
+        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ["action" => "get", "count" => true]);
+        $response = $this->_createPresenter()->run($request);
+        Assert::type("Nette\Application\Responses\JsonResponse", $response);
+        Assert::same("application/json", $response->getContentType());
+        Assert::same(3, $response->getPayload()->body);
     }
 
     public function testGetWithFilter()
@@ -190,7 +206,7 @@ class ApiTest extends Tester\TestCase
         Assert::same(["Invalid where parameter. Must be a valid JSON but 'foo' given!"], $response->getPayload()->messages);
     }
 
-    public function testPut()
+    public function testPutId()
     {
         $savedEntity = new Tests\Model\Entity\Simple(["id" => 1, "text" => "foo"]);
 
@@ -207,13 +223,43 @@ class ApiTest extends Tester\TestCase
         Assert::type("UniMapper\Nette\Api\Resource", $payload);
         Assert::true($payload->success);
         Assert::same('/api/simple/1', $payload->link);
-        Assert::same(['id' => 1, 'text' => "foo"], $payload->body);
+        Assert::type("UniMapper\Nette\Tests\Model\Entity\Simple", $payload->body);
+        Assert::same(1, $payload->body->id);
     }
 
-    public function testPutNoPrimary()
+    public function testPutFilter()
     {
-        $this->inputMock->shouldReceive("getData")->once()->andReturn(null);
+        $this->inputMock->shouldReceive("getData")->once()->andReturn('{"text": "foo"}');
         $this->repositoryMock->shouldReceive("getEntityName")->once()->andReturn("Simple");
+        $this->repositoryMock->shouldReceive("updateBy")
+            ->with(
+                Mockery::type("UniMapper\Nette\Tests\Model\Entity\Simple"),
+                ["id" => ["=" => 3]]
+            )
+            ->once()
+            ->andReturn(3);
+
+        $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::PUT, ["action" => "put", "where" => '{"id": {"=": 3}}']);
+        $response = $this->_createPresenter()->run($request);
+        Assert::type("Nette\Application\Responses\JsonResponse", $response);
+        Assert::same("application/json", $response->getContentType());
+
+        $payload = $response->getPayload();
+        Assert::type("UniMapper\Nette\Api\Resource", $payload);
+        Assert::true($payload->success);
+    }
+
+    public function testPut()
+    {
+        $this->inputMock->shouldReceive("getData")->once()->andReturn('{"text": "foo"}');
+        $this->repositoryMock->shouldReceive("getEntityName")->once()->andReturn("Simple");
+        $this->repositoryMock->shouldReceive("updateBy")
+            ->with(
+                Mockery::type("UniMapper\Nette\Tests\Model\Entity\Simple"),
+                []
+            )
+            ->once()
+            ->andReturn(3);
 
         $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::PUT, ["action" => "put"]);
         $response = $this->_createPresenter()->run($request);
@@ -222,8 +268,7 @@ class ApiTest extends Tester\TestCase
 
         $payload = $response->getPayload();
         Assert::type("UniMapper\Nette\Api\Resource", $payload);
-        Assert::false($payload->success);
-        Assert::same(["Primary value required!"], $payload->messages);
+        Assert::true($payload->success);
     }
 
     public function testDelete()
@@ -242,6 +287,7 @@ class ApiTest extends Tester\TestCase
                 'link' => NULL,
                 'code' => NULL,
                 'body' => array(),
+                'count'=> NULL,
                 'messages' => array(),
             ),
             (array) $response->getPayload()

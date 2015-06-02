@@ -73,6 +73,7 @@ Now you can call standard API methods like:
 Get all records with following optional parameters:
 - **where** [filter](http://unimapper.github.io/docs/reference/repository/#filtering-data) in valid JSON format
 - **associate** list of associations to join as `array`, syntax should look like `?associate[]=property1&associate[]=property2`
+- **count** default is `false`, if `true` set then items count number will be returned in body of response
 
 ### GET /api/entity/1
 Get a single record with following optional parameters:
