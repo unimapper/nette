@@ -5,7 +5,6 @@ namespace UniMapper\Nette\Api;
 use Nette\Application\Responses\JsonResponse;
 use Nette\Utils\Json;
 use UniMapper\Reflection;
-use UniMapper\NamingConvention as UNC;
 use UniMapper\Nette\Api\RepositoryList;
 
 abstract class Presenter extends \Nette\Application\UI\Presenter
@@ -191,11 +190,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
             $entity->{$reflection->getPrimaryProperty()->getName()} = $reflection->getPrimaryProperty()->convertValue($id); // @todo catch unsuccessfull convert
 
             try {
-
                 $this->putOne($entity);
-
-                $this->resource->link = $this->link("get", $id);
-                $this->resource->body = $entity;
             } catch (\UniMapper\Exception $e) {
 
                 if ($e instanceof \UniMapper\Exception\ValidatorException) {

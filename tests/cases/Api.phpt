@@ -129,7 +129,6 @@ class ApiTest extends Tester\TestCase
                 'link' => NULL,
                 'code' => 404,
                 'body' => array(),
-                'count' => null,
                 'messages' => array('Record not found!'),
             ),
             (array) $response->getPayload()
@@ -222,9 +221,7 @@ class ApiTest extends Tester\TestCase
         $payload = $response->getPayload();
         Assert::type("UniMapper\Nette\Api\Resource", $payload);
         Assert::true($payload->success);
-        Assert::same('/api/simple/1', $payload->link);
-        Assert::type("UniMapper\Nette\Tests\Model\Entity\Simple", $payload->body);
-        Assert::same(1, $payload->body->id);
+        Assert::same([], $payload->body);
     }
 
     public function testPutFilter()
@@ -287,7 +284,6 @@ class ApiTest extends Tester\TestCase
                 'link' => NULL,
                 'code' => NULL,
                 'body' => array(),
-                'count'=> NULL,
                 'messages' => array(),
             ),
             (array) $response->getPayload()
