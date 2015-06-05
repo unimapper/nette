@@ -82,11 +82,25 @@ class ApiTest extends Tester\TestCase
         );
     }
 
+    public function testNoRepositoryWithCustomAction()
+    {
+        $this->inputMock->shouldReceive("getData")->once()->andReturn(null);
+        $request = new Nette\Application\Request(
+            'Api:NoRepository',
+            Nette\Http\Request::GET, ["action" => "test"]
+        );
+        Assert::type(
+            "Nette\Application\Responses\JsonResponse",
+            $this->_createPresenter()->run($request)
+        );
+    }
+
     /**
      * @throws Nette\Application\BadRequestException Repository 'NoRepository' not found!
      */
     public function testNoRepository()
     {
+        $this->inputMock->shouldReceive("getData")->once()->andReturn(null);
         $request = new Nette\Application\Request('Api:NoRepository', Nette\Http\Request::GET, ["action" => "get"]);
         $this->_createPresenter()->run($request);
     }

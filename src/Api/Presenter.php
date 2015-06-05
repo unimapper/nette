@@ -10,9 +10,6 @@ use UniMapper\Nette\Api\RepositoryList;
 abstract class Presenter extends \Nette\Application\UI\Presenter
 {
 
-    /** @var \UniMapper\Repository $repository */
-    protected $repository;
-
     /** @var \UniMapper\Nette\Api\RepositoryList $repositories */
     private $repositories;
 
@@ -48,18 +45,25 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         $this->input = $input;
     }
 
-    public function startup()
+    protected function getRepository()
     {
-        parent::startup();
-
-        $this->resource = new Resource;
-
         $name = $this->getPresenterName();
         if (!isset($this->repositories[$name])) {
             $this->error("Repository '" . $name . "' not found!");
         }
 
-        $this->repository = $this->repositories[$name];
+        return $this->repositories[$name];
+    }
+
+    protected function getEntityReflection()
+    {
+        return Reflection\Loader::load($this->getRepository()->getEntityName());
+    }
+
+    public function startup()
+    {
+        parent::startup();
+        $this->resource = new Resource;
         $this->data = (array) Json::decode($this->input->getData(), Json::FORCE_ARRAY);
     }
 
@@ -75,7 +79,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
         if ($id) {
 
-            $reflection = Reflection\Loader::load($this->repository->getEntityName());
+            $reflection = $this->getEntityReflection();
             if (!$reflection->hasPrimary()) {
 
                 $this->resource->success = false;
@@ -84,7 +88,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
                 return;
             }
 
-            $entity = $this->repository->findOne(
+            $entity = $this->getOne(
                 $reflection->getPrimaryProperty()->convertValue($id),
                 $associate
             );
@@ -115,11 +119,8 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
             try {
 
-                $this->resource->body = $count ? $this->repository->count($filter) : $this->repository->find(
+                $this->resource->body = $count ? $this->count($filter) : $this->get(
                     $filter,
-                    [],
-                    $this->getLimit(),
-                    $this->getOffset(),
                     $associate
                 );
             } catch (\UniMapper\Exception\RepositoryException $e) {
@@ -133,7 +134,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     public function actionPost()
     {
-        $reflection = Reflection\Loader::load($this->repository->getEntityName());
+        $reflection = $this->getEntityReflection();
 
         if (!$reflection->hasPrimary()) {
 
@@ -173,7 +174,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     public function actionPut($id = null, $where = null)
     {
-        $reflection = Reflection\Loader::load($this->repository->getEntityName());
+        $reflection = $this->getEntityReflection();
 
         $entity = $reflection->createEntity($this->data); // @todo catch unsuccessfull convert
 
@@ -232,7 +233,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
         if ($id) {
             // Delete one
 
-            $reflection = Reflection\Loader::load($this->repository->getEntityName());
+            $reflection = $this->getEntityReflection();
             if (!$reflection->hasPrimary()) {
 
                 $this->resource->success = false;
@@ -306,27 +307,48 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     protected function deleteOne(\UniMapper\Entity $entity)
     {
-        return $this->repository->destroy($entity);
+        return $this->getRepository()->destroy($entity);
     }
 
     protected function delete(array $where = [])
     {
-        return $this->repository->destroyBy($where);
+        return $this->getRepository()->destroyBy($where);
     }
 
     protected function post(\UniMapper\Entity $entity)
     {
-        return $this->repository->save($entity);
+        return $this->getRepository()->save($entity);
     }
 
     protected function put(\UniMapper\Entity $entity, array $filter = [])
     {
-        return $this->repository->updateBy($entity, $filter);
+        return $this->getRepository()->updateBy($entity, $filter);
     }
 
     protected function putOne(\UniMapper\Entity $entity)
     {
-        return $this->repository->save($entity);
+        return $this->getRepository()->save($entity);
+    }
+
+    protected function count(array $filter = [])
+    {
+        return $this->getRepository()->count($filter);
+    }
+
+    protected function get(array $filter = [], array $associate = [])
+    {
+        return $this->getRepository()->find(
+            $filter,
+            [],
+            $this->getLimit(),
+            $this->getOffset(),
+            $associate
+        );
+    }
+
+    protected function getOne($primary, array $associate = [])
+    {
+        return $this->getRepository()->findOne($primary, $associate);
     }
 
 }
