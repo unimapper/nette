@@ -8,7 +8,6 @@ use Nette\Http\Url;
 use Nette\Application\Request;
 use Nette\InvalidStateException;
 use Nette\Utils\Strings;
-use UniMapper\NamingConvention as UNC;
 
 /**
  * @author Adam Štipák
@@ -52,12 +51,7 @@ class Route extends \Nette\Application\Routers\Route
 
         $frags = explode('/', Strings::replace($cleanPath, '/^' . $path . '\//'));
 
-        $entityName = Strings::firstUpper($frags[0]);
-
-        // Check if entity exists
-        if (!class_exists(UNC::nameToClass($entityName, UNC::ENTITY_MASK))) {
-            return;
-        }
+        $resource = Strings::firstUpper($frags[0]);
 
         // Set 'id' parameter if not custom action
         if (isset($frags[1]) && $this->_isApiAction($params['action'])) {
@@ -65,7 +59,7 @@ class Route extends \Nette\Application\Routers\Route
         }
 
         return new Request(
-            empty($this->module) ? $entityName : $this->module . ':' . $entityName,
+            empty($this->module) ? $resource : $this->module . ':' . $resource,
             $httpRequest->getMethod(),
             $params
         );

@@ -20,13 +20,13 @@ class ApiRouteTest extends Tester\TestCase
         Assert::same("///api/simple", $route->constructUrl($appRequest, $url));
     }
 
-    public function testGetUndefinedEntity()
+    public function testGetUndefinedPresenter()
     {
         $url = new Nette\Http\UrlScript("/api/undefined");
         $httpRequest = new Nette\Http\Request($url, null, null, null, null, null, Nette\Http\Request::GET);
 
         $route = new UniMapper\Nette\Api\Route("Api");
-        Assert::null($appRequest = $route->match($httpRequest));
+        Assert::type("Nette\Application\Request", $route->match($httpRequest));
     }
 
     public function testPut()
@@ -69,6 +69,18 @@ class ApiRouteTest extends Tester\TestCase
         $route = new UniMapper\Nette\Api\Route("Api");
         Assert::type("Nette\Application\Request", $appRequest = $route->match($httpRequest));
         Assert::same("///api/simple?action=custom", $route->constructUrl($appRequest, $url));
+    }
+
+    public function testGetNoRepository()
+    {
+        $url = new Nette\Http\UrlScript("/api/norepository");
+        $url->setQueryParameter("action", "test");
+
+        $httpRequest = new Nette\Http\Request($url, null, null, null, null, null, Nette\Http\Request::GET);
+
+        $route = new UniMapper\Nette\Api\Route("Api");
+        Assert::type("Nette\Application\Request", $appRequest = $route->match($httpRequest));
+        Assert::same("///api/norepository?action=test", $route->constructUrl($appRequest, $url));
     }
 
 }
