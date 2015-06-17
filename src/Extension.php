@@ -139,6 +139,11 @@ class Extension extends CompilerExtension
             // Iterate over services
             foreach ($builder->getDefinitions() as $serviceName => $serviceDefinition) {
 
+                // Skip dynamic services
+                if (!$serviceDefinition->factory && $serviceDefinition->class === null) {
+                    continue;
+                }
+
                 $class = $serviceDefinition->class !== null ? $serviceDefinition->class : $serviceDefinition->factory->entity;
 
                 // Register repository to API's repository list
