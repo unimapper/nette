@@ -15,7 +15,7 @@ $ composer require unimapper/nette:@dev
 
 Register extension in `config.neon`.
 
-```yml
+```neon
 extensions:
     unimapper: UniMapper\Nette\Extension
 ```
@@ -32,7 +32,7 @@ return $configurator->createContainer();
 
 ## Configuration
 
-```yml
+```neon
 unimapper:
     adapters:
         Mongo: @service
@@ -201,3 +201,37 @@ In your templates just use standard Nette link macro.
 - `{link :Api:Entity:put 1}`
 - `{link :Api:Entity:post}`
 - `{link :Api:Entity:action}`
+
+### Usage
+You can even build another applications using this API, just register an official API adapter class `UniMapper\Nette\Api\Adapter` in your **config.neon**.
+
+#### Custom request factory
+
+For easier API queries you can register factory interface as a dynamic service in your **config.neon**.
+
+```neon
+services:
+    - UniMapper\Nette\Api\ICustomRequestFactory
+```
+
+Usage in your reopistory can look like this:
+
+```php
+class SomeRepository extends \UniMapper\Repository
+{
+    private $requestFactory;
+
+    public function __construct(
+        \UniMapper\Connection $connection,
+        \UniMapper\Nette\Api\ICustomRequestFactory $requestFactory
+    ) {
+        parent::__construct($connection);
+        $this->requestFactory;
+    }
+
+    public function getSomethingFromApi()
+    {
+        $this->requestFactory()->setResource("apiResource")->setAction("custom")->send();
+    }
+}
+```

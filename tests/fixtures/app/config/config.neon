@@ -17,3 +17,5 @@ unimapper:
 
 services:
     simpleRepository: UniMapper\Nette\Tests\Model\Repository\SimpleRepository
+    apiAdapter:  UniMapper\Nette\Api\Adapter("url")
+    - UniMapper\Nette\Api\ICustomRequestFactory
