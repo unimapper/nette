@@ -15,7 +15,7 @@ $ composer require unimapper/nette:@dev
 
 Register extension in `config.neon`.
 
-```neon
+```yml
 extensions:
     unimapper: UniMapper\Nette\Extension
 ```
@@ -32,7 +32,7 @@ return $configurator->createContainer();
 
 ## Configuration
 
-```neon
+```yml
 unimapper:
     adapters:
         Mongo: @service
@@ -45,6 +45,7 @@ unimapper:
     api:
         enabled: false
         module: "Api"
+        route: true
     panel:
         enabled: true
         ajax: true # log queries in AJAX requests
@@ -209,7 +210,7 @@ You can even build another applications using this API, just register an officia
 
 For easier API queries you can register factory interface as a dynamic service in your **config.neon**.
 
-```neon
+```yml
 services:
     - UniMapper\Nette\Api\ICustomRequestFactory
 ```
