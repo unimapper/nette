@@ -38,7 +38,8 @@ class Extension extends CompilerExtension
         ],
         "api" => [
             "enabled" => false,
-            "module" => "Api"
+            "module" => "Api",
+            "router"  => true
         ],
         "customQueries" => []
     ];
@@ -154,12 +155,14 @@ class Extension extends CompilerExtension
                 }
             }
 
-            // Prepend API route
-            $builder->getDefinition("router")
-                ->addSetup(
-                    'UniMapper\Nette\Api\RouterFactory::prependTo($service, ?)',
-                    [$config['api']['module']]
-                );
+            // Prepend API route if enabled
+            if ($config["api"]["router"]) {
+                $builder->getDefinition("router")
+                    ->addSetup(
+                        'UniMapper\Nette\Api\RouterFactory::prependTo($service, ?)',
+                        [$config['api']['module']]
+                    );
+            }
         }
     }
 
