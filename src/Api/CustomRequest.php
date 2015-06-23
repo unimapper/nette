@@ -4,6 +4,7 @@ namespace UniMapper\Nette\Api;
 
 use Eset\Utils\ArrayUtils;
 use Nette\Http\Url;
+use UniMapper\Exception;
 
 class CustomRequest
 {
@@ -135,6 +136,19 @@ class CustomRequest
         );
 
         $result = $this->adapter->query($url->getRelativeUrl(), $this->method);
+        if ($result->success === false) {
+            throw new Exception\AdapterException(
+                json_encode($result->messages),
+                (string) $url
+            );
+        }
+
+        if (!isset($result->body)) {
+            throw new Exception\AdapterException(
+                'Body not provided in response!',
+                (string) $url
+            );
+        }
 
         return ArrayUtils::objectToArray($result->body);
     }

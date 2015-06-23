@@ -174,7 +174,8 @@ class Adapter extends \UniMapper\Adapter
 
             if ($result->success === false) {
                 throw new Exception\AdapterException(
-                    json_encode($result->messages)
+                    json_encode($result->messages),
+                    $query
                 );
             }
             return $result->body;
@@ -194,7 +195,8 @@ class Adapter extends \UniMapper\Adapter
 
             if ($result->success === false) {
                 throw new Exception\AdapterException(
-                    json_encode($result->messages)
+                    json_encode($result->messages),
+                    $query
                 );
             }
             return $result->body;
