@@ -135,7 +135,7 @@ class CustomRequest
             array_merge(['action' => $this->getAction()], $this->getValues())
         );
 
-        $result = $this->adapter->query($url->getRelativeUrl(), $this->method);
+        $result = $this->adapter->query($url->getPath() . '?' . $url->getQuery(), $this->method);
         if ($result->success === false) {
             throw new Exception\AdapterException(
                 json_encode($result->messages),
