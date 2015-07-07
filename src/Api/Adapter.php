@@ -163,7 +163,7 @@ class Adapter extends \UniMapper\Adapter
         throw new \Exception("Not implemented!");
     }
 
-    public function createInsert($resource, array $values)
+    public function createInsert($resource, array $values, $primaryName = null)
     {
         $query = new Adapter\Query(
             $this->host . "/" . $resource,
