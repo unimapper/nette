@@ -17,7 +17,7 @@
     "require-dev": {
         "nette/tester": "~1.5.0",
         "mockery/mockery": "~0.9.0",
-        "bauer01/unimapper": "dev-master",
+        "bauer01/unimapper": "~1.1.0",
         "nette/nette": "~2.0",
         "squizlabs/php_codesniffer": "~2.0"
     },
