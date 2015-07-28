@@ -70,7 +70,16 @@ class Panel implements IBarPanel
                 include __DIR__ . "/panel/templates/results.phtml";
                 $debug["template"] = ob_get_clean();
             }
-            $this->response->setHeader(self::HEADER_PREFIX, base64_encode(json_encode($debug)));
+
+            $data = base64_encode(json_encode($debug));
+
+            // Workaround for Chrome header limit as https://github.com/Seldaek/monolog/issues/172
+            if (strlen($data) > 240 * 1024) {
+                $debug["template"] = "Incomplete logs, chrome header size limit reached!";
+                $data = base64_encode(json_encode($debug));
+            }
+
+            $this->response->setHeader(self::HEADER_PREFIX, $data);
         }
     }
 
