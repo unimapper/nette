@@ -15,7 +15,7 @@
         "ext-curl": "*"
     },
     "require-dev": {
-        "nette/tester": "~1.3.0",
+        "nette/tester": "~1.5.0",
         "mockery/mockery": "~0.9.0",
         "bauer01/unimapper": "dev-master",
         "nette/nette": "~2.0",
