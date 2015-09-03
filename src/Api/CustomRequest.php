@@ -129,13 +129,26 @@ class CustomRequest
             $this->setValues($values);
         }
 
-        $url = new Url;
-        $url->setPath($this->getResource());
-        $url->setQuery(
-            array_merge(['action' => $this->getAction()], $this->getValues())
-        );
+        if ($this->method === self::POST || $this->method === self::PUT) {
+            $content = $this->values;
 
-        $result = $this->adapter->query($url->getPath() . '?' . $url->getQuery(), $this->method);
+            $url = new Url;
+            $url->setPath($this->getResource());
+            $url->setQuery(
+                ['action' => $this->getAction()]
+            );
+        } else {
+            $content = [];
+
+            $url = new Url;
+            $url->setPath($this->getResource());
+            $url->setQuery(
+                array_merge(['action' => $this->getAction()], $this->getValues())
+            );
+        }
+
+        $result = $this->adapter->query($url->getPath() . '?' . $url->getQuery(), $this->method, $content);
+
         if ($result->success === false) {
             throw new Exception\AdapterException(
                 json_encode($result->messages),
