@@ -9,6 +9,7 @@ $elapsed = $this->_getElapsed(); ?>
     <thead>
         <th>Elapsed time</th>
         <th>Demands</th>
+        <th>Entity</th>
         <th>Query</th>
         <th>Adapters</th>
         <th>Result</th>
@@ -34,6 +35,7 @@ $elapsed = $this->_getElapsed(); ?>
                        <div class="demands-level-<?php echo $demands ?>" style="width: <?php echo $queryLevel  ?>%"></div>
                     </div>
                 </td>
+                <td><?php echo $query->entityReflection->getName() ?></td>
                 <td>
                     <?php if ($query): ?>
                         <?php include __DIR__ . '/queries/detail.phtml' ?>
