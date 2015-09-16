@@ -22,9 +22,9 @@ class Query implements \UniMapper\Adapter\IQuery
         $this->method = $method;
     }
 
-    public function setConditions(array $conditions)
+    public function setFilter(array $filter)
     {
-        $this->parameters["where"] = $this->_formatConditions($conditions);
+        $this->parameters["where"] = $filter;
     }
 
     public function setAssociations(array $associations)
@@ -41,48 +41,10 @@ class Query implements \UniMapper\Adapter\IQuery
             $parameters["where"] = json_encode($this->parameters["where"]);
         }
 
-        return $this->url . "?" . http_build_query($parameters);
-    }
-
-    private function _formatConditions(array $conditions)
-    {
-        $result = [];
-
-        foreach ($conditions as $condition) {
-
-            if (is_array($condition[0])) {
-                // Nested conditions
-
-                list($nestedConditions, $joiner) = $condition;
-
-                throw new \Exception("Nested conditions are not supported!");
-            } else {
-                // Simple condition
-
-                list($name, $operator, $value, $joiner) = $condition;
-
-                $operator = strtolower($operator);
-
-                if (isset($operator[$name][$operator])) {
-                    throw new \Exception("Duplicate condition found!");
-                }
-
-                if ($operator === "in" || $operator === "is") {
-                    $operator = "=";
-                }
-                if ($operator === "not in" || $operator === "is not" || $operator === "!=") {
-                    $operator = "!";
-                }
-
-                if (strtolower($joiner) === "or") {
-                    $result[]["or"][][$name][$operator] = $value;
-                } else {
-                    $result[][$name][$operator] = $value;
-                }
-            }
+        if ($parameters) {
+            return $this->url . "?" . http_build_query($parameters);
         }
-
-        return $result;
+        return $this->url;
     }
 
 }

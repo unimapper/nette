@@ -4,7 +4,7 @@ namespace UniMapper\Nette\Api;
 
 use Nette\Application\Responses\JsonResponse;
 use Nette\Utils\Json;
-use UniMapper\Reflection;
+use UniMapper\Entity\Reflection;
 use UniMapper\Nette\Api\RepositoryList;
 
 abstract class Presenter extends \Nette\Application\UI\Presenter
@@ -57,7 +57,7 @@ abstract class Presenter extends \Nette\Application\UI\Presenter
 
     protected function getEntityReflection()
     {
-        return Reflection\Loader::load($this->getRepository()->getEntityName());
+        return Reflection::load($this->getRepository()->getEntityName());
     }
 
     public function startup()

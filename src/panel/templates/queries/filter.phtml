@@ -1,0 +1,6 @@
+<?php if ($query->filter) : ?>
+    <tr>
+        <th>Filter</th>
+        <td><?php echo UniMapper\Nette\Extension::dump($query->filter, true) ?></td>
+    </tr>
+<?php endif ?>

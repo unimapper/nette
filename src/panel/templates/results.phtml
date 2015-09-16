@@ -57,13 +57,13 @@ $elapsed = $this->_getElapsed(); ?>
                 <td>
                     <?php if ($query): ?>
                         <!-- result -->
-                        <?php if ($captured->result instanceof \UniMapper\EntityCollection): ?>
+                        <?php if ($captured->result instanceof \UniMapper\Entity\Collection): ?>
                             <?php if (count($captured->result) === 0): ?>
-                                [0] <?php echo UNC::classToName($captured->result->getEntityReflection()->getClassName(), UNC::ENTITY_MASK) ?>
+                                [0] <?php echo UNC::classToName($captured->result->getEntityClass(), UNC::ENTITY_MASK) ?>
                             <?php else: ?>
                                 <span class="unimapper-panel-label"><?php echo count($captured->result) ?></span>
                                 <a href="#unimapper-panel-result-<?php echo $index ?>" class="tracy-toggle tracy-collapsed nette-toggler nette-toggle-collapsed" rel="#unimapper-panel-result-<?php echo $index ?>">
-                                    <?php echo UNC::classToName($captured->result->getEntityReflection()->getClassName(), UNC::ENTITY_MASK) ?>
+                                    <?php echo UNC::classToName($captured->result->getEntityClass(), UNC::ENTITY_MASK) ?>
                                 </a>
                                 <div id="unimapper-panel-result-<?php echo $index ?>" class="nette-collapsed tracy-collapsed">
                                     <?php foreach ($captured->result as $entity) { ?>

@@ -151,8 +151,7 @@ class ApiTest extends Tester\TestCase
 
     public function testGet()
     {
-        $collection = new UniMapper\EntityCollection(
-            "Simple",
+        $collection = Tests\Model\Entity\Simple::createCollection(
             [["text" => "foo", "id" => 1], ["text" => "foo2", "id" => 2]]
         );
         $this->inputMock->shouldReceive("getData")->once();
@@ -165,7 +164,7 @@ class ApiTest extends Tester\TestCase
         $response = $this->_createPresenter()->run($request);
         Assert::type("Nette\Application\Responses\JsonResponse", $response);
         Assert::same("application/json", $response->getContentType());
-        Assert::type("UniMapper\EntityCollection", $response->getPayload()->body);
+        Assert::type("UniMapper\Entity\Collection", $response->getPayload()->body);
         Assert::count(2, $response->getPayload()->body);
         Assert::same("foo", $response->getPayload()->body[0]->text);
         Assert::same("foo2", $response->getPayload()->body[1]->text);
@@ -194,13 +193,13 @@ class ApiTest extends Tester\TestCase
         $this->repositoryMock->shouldReceive("find")
             ->with(["id" => ["=" => 1]], [], 10, 0, [])
             ->once()
-            ->andReturn(new UniMapper\EntityCollection("Simple"));
+            ->andReturn(Tests\Model\Entity\Simple::createCollection());
 
         $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ["action" => "get", "where" => '{"id": {"=": 1}}']);
         $response = $this->_createPresenter()->run($request);
         Assert::type("Nette\Application\Responses\JsonResponse", $response);
         Assert::same("application/json", $response->getContentType());
-        Assert::type("UniMapper\EntityCollection", $response->getPayload()->body);
+        Assert::type("UniMapper\Entity\Collection", $response->getPayload()->body);
         Assert::count(0, $response->getPayload()->body);
     }
 
@@ -210,7 +209,7 @@ class ApiTest extends Tester\TestCase
         $this->repositoryMock->shouldReceive("find")
             ->with(["id" => ["=" => 1]], [], 10, 0, [])
             ->once()
-            ->andReturn(new UniMapper\EntityCollection("Simple"));
+            ->andReturn(Tests\Model\Entity\Simple::createCollection());
 
         $request = new Nette\Application\Request('Api:Simple', Nette\Http\Request::GET, ["action" => "get", "where" => 'foo']);
         $response = $this->_createPresenter()->run($request);
