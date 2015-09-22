@@ -7,6 +7,7 @@
         <table>
             <?php include __DIR__ . '/selection.phtml' ?>
             <?php include __DIR__ . '/conditions.phtml' ?>
+            <?php include __DIR__ . '/associations.phtml' ?>
             <?php include __DIR__ . '/limit.phtml' ?>
             <?php include __DIR__ . '/offset.phtml' ?>
             <?php include __DIR__ . '/orderBy.phtml' ?>
@@ -43,11 +44,11 @@
         </table>
     <?php elseif ($query instanceof Query\Count): ?>
         <table>
-            <?php include __DIR__ . '/conditions.phtml' ?>
+            <?php include __DIR__ . '/filter.phtml' ?>
         </table>
     <?php elseif ($query instanceof Query\Delete): ?>
         <table>
-            <?php include __DIR__ . '/conditions.phtml' ?>
+            <?php include __DIR__ . '/filter.phtml' ?>
         </table>
     <?php elseif ($query instanceof Query\Insert): ?>
         <table>
@@ -58,7 +59,7 @@
         </table>
     <?php elseif ($query instanceof Query\Update): ?>
         <table>
-            <?php include __DIR__ . '/conditions.phtml' ?>
+            <?php include __DIR__ . '/filter.phtml' ?>
             <tr>
                 <th>Data</th>
                 <td><?php echo UniMapper\Nette\Extension::dump($query->entity->getData(), true) ?></td>

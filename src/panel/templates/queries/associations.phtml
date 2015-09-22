@@ -1,0 +1,16 @@
+<?php if (count($query->associations["local"])): ?>
+<tr>
+    <th>Associate</th>
+    <td>
+        <?php echo UniMapper\Nette\Extension::dump($query->associations["local"], true) ?>
+    </td>
+</tr>
+<?php endif ?>
+<?php if (count($query->associations["remote"]) > 0): ?>
+<tr>
+    <th>Associate <span class="unimapper-panel-label" style="background-color: #428bca; color: #fff;">Remote</span></th>
+    <td>
+        <?php echo UniMapper\Nette\Extension::dump($query->associations["remote"], true) ?>
+    </td>
+</tr>
+<?php endif ?>
