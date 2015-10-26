@@ -61,7 +61,10 @@ class Panel implements IBarPanel
 
     public function onResponse(NA\Application $application, NA\IResponse $response)
     {
-        if ($this->config["panel"]["ajax"] && $application->getPresenter()->isAjax()) {
+        if ($this->config["panel"]["ajax"] 
+            && $application->getPresenter() instanceOf \Nette\Application\UI\Presenter
+            && $application->getPresenter()->isAjax()
+        ) {
 
             $debug = ["count" => count($this->_getElapsed())];
             if ($debug["count"]) {
