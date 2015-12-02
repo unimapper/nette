@@ -63,10 +63,10 @@
 
                         if (this.readyState === 4) {
 
-                            header = this.getResponseHeader("<?php echo self::HEADER_PREFIX ?>");
+                            var header = this.getResponseHeader("<?php echo self::HEADER_PREFIX ?>");
                             if (header != null) {
 
-                                data = JSON.parse(self.base64decode(header));
+                                var data = JSON.parse(self.base64decode(header));
                                 if (data.count) {
 
                                     var countElem = document.getElementById('unimapper-panel-count-new');
