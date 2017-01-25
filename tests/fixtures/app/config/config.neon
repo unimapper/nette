@@ -7,15 +7,11 @@ extensions:
     unimapper: UniMapper\Nette\Extension
 
 unimapper:
-    namingConvention:
+    convention:
         repository: 'UniMapper\Nette\Tests\Model\Repository\*Repository'
         entity: 'UniMapper\Nette\Tests\Model\Entity\*'
-    api:
-        enabled: true
     customQueries:
         - UniMapper\Nette\Tests\Model\Query\Custom
 
 services:
     simpleRepository: UniMapper\Nette\Tests\Model\Repository\SimpleRepository
-    apiAdapter:  UniMapper\Nette\Api\Adapter("url")
-    - UniMapper\Nette\Api\ICustomRequestFactory

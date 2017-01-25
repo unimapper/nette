@@ -3,7 +3,7 @@
 namespace UniMapper\Nette;
 
 use Nette\Application as NA;
-use Nette\Diagnostics\IBarPanel;
+use Tracy\IBarPanel;
 use Nette\Http\Response;
 
 class Panel implements IBarPanel

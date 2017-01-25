@@ -32,14 +32,9 @@ class Extension extends CompilerExtension
         ],
         "profiler" => true,
         "cache" => true,
-        "namingConvention" => [
+        "convention" => [
             "repository" => null,
             "entity" => null
-        ],
-        "api" => [
-            "enabled" => false,
-            "module" => "Api",
-            "router"  => true
         ],
         "customQueries" => []
     ];
@@ -62,14 +57,6 @@ class Extension extends CompilerExtension
 
         // Create query builder
         $builder->addDefinition($this->prefix("connection"))->setClass("UniMapper\Connection");
-
-        // Setup API
-        if ($config["api"]["enabled"]) {
-            $builder->addDefinition($this->prefix("repositories"))
-                ->setClass("UniMapper\Nette\Api\RepositoryList");
-            $builder->addDefinition($this->prefix("input"))
-                ->setClass("UniMapper\Nette\Api\Input");
-        }
 
         // Debug mode
         if ($builder->parameters["debugMode"] && $config["panel"]["enabled"]) {
@@ -133,37 +120,6 @@ class Extension extends CompilerExtension
                     [[$this->prefix("@panel"), "getTab"]]
                 );
         }
-
-        // Generate API
-        if ($config["api"]["enabled"]) {
-
-            // Iterate over services
-            foreach ($builder->getDefinitions() as $serviceName => $serviceDefinition) {
-
-                // Skip dynamic services
-                if (!$serviceDefinition->factory && $serviceDefinition->class === null) {
-                    continue;
-                }
-
-                $class = $serviceDefinition->class !== null ? $serviceDefinition->class : $serviceDefinition->factory->entity;
-
-                // Register repository to API's repository list
-                if (class_exists($class) && is_subclass_of($class, "UniMapper\Repository")) {
-
-                    $builder->getDefinition($this->prefix("repositories"))
-                        ->addSetup('$service[] = $this->getService(?)', [$serviceName]);
-                }
-            }
-
-            // Prepend API route if enabled
-            if ($config["api"]["router"]) {
-                $builder->getDefinition("router")
-                    ->addSetup(
-                        'UniMapper\Nette\Api\RouterFactory::prependTo($service, ?)',
-                        [$config['api']['module']]
-                    );
-            }
-        }
     }
 
     public function afterCompile(ClassType $class)
@@ -172,16 +128,16 @@ class Extension extends CompilerExtension
         $initialize = $class->methods['initialize'];
 
         // Naming convention
-        if ($config["namingConvention"]["entity"]) {
+        if ($config["convention"]["entity"]) {
             $initialize->addBody(
-                'UniMapper\NamingConvention::setMask(?, UniMapper\NamingConvention::ENTITY_MASK);',
-                [$config["namingConvention"]["entity"]]
+                'UniMapper\Convention::setMask(?, UniMapper\Convention::ENTITY_MASK);',
+                [$config["convention"]["entity"]]
             );
         }
-        if ($config["namingConvention"]["repository"]) {
+        if ($config["convention"]["repository"]) {
             $initialize->addBody(
-                'UniMapper\NamingConvention::setMask(?, UniMapper\NamingConvention::REPOSITORY_MASK);',
-                [$config["namingConvention"]["repository"]]
+                'UniMapper\Convention::setMask(?, UniMapper\Convention::REPOSITORY_MASK);',
+                [$config["convention"]["repository"]]
             );
         }
 
